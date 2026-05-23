@@ -3,20 +3,20 @@ import { render } from '@testing-library/react-native';
 import { TaskCard } from '../TaskCard';
 
 describe('TaskCard', () => {
-  it('mostra título, status e chips de time', () => {
+  it('renders the task title, status, and team chips', () => {
     const { getByText, getAllByText } = render(
       <TaskCard
         task={{
           id: 'task-1',
-          title: 'Título da tarefa',
-          description: 'Descrição da tarefa',
+          title: 'Task title',
+          description: 'Task description',
           status: 'Concluida',
           teamIds: ['team-1'],
         }}
         teams={[
           {
             id: 'team-1',
-            name: 'Time A',
+            name: 'Team A',
             colorHex: '#8BFF3D',
           },
         ]}
@@ -24,9 +24,9 @@ describe('TaskCard', () => {
       />,
     );
 
-    expect(getByText('Título da tarefa')).toBeTruthy();
-    expect(getByText('Descrição da tarefa')).toBeTruthy();
+    expect(getByText('Task title')).toBeTruthy();
+    expect(getByText('Task description')).toBeTruthy();
     expect(getByText('concluida')).toBeTruthy();
-    expect(getAllByText('Time A').length).toBeGreaterThan(0);
+    expect(getAllByText('Team A').length).toBeGreaterThan(0);
   });
 });

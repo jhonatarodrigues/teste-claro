@@ -3,8 +3,8 @@ import { CheckCheck, ChevronLeft, Trash2 } from 'lucide-react-native';
 import { Pressable, Text, View } from 'react-native';
 
 import { TaskForm, TaskFormData } from '../components/tasks/TaskForm';
-import { Screen } from '../components/ui/Screen';
 import { EmptyState } from '../components/ui/EmptyState';
+import { Screen } from '../components/ui/Screen';
 import { useTask } from '../hooks/useTask';
 import { useTaskMutations } from '../hooks/useTaskMutations';
 import { useTeams } from '../hooks/useTeams';
@@ -50,53 +50,56 @@ export function TaskFormScreen({ navigation, route }: Props) {
   };
 
   return (
-    <Screen scroll>
-      <View className="pt-4">
-        <View className="flex-row items-center justify-between">
-          <Pressable onPress={() => navigation.goBack()} className="h-12 w-12 items-start justify-center">
-            <ChevronLeft color="#ffffff" size={20} />
-          </Pressable>
-          {editing && taskId ? (
-            <Pressable
-              onPress={async () => {
-                await deleteTask.mutateAsync(taskId);
-                navigation.popToTop();
-              }}
-              className="h-12 w-12 items-end justify-center"
-            >
-              <Trash2 color="#ffffff" size={18} />
+    <Screen
+      scroll
+      header={
+        <View className="pt-4">
+          <View className="flex-row items-center justify-between">
+            <Pressable onPress={() => navigation.goBack()} className="h-12 w-12 items-start justify-center">
+              <ChevronLeft color="#ffffff" size={20} />
             </Pressable>
-          ) : (
-            <View className="h-12 w-12" />
-          )}
-        </View>
-
-        <View className="mt-10 items-center">
-          <View className="h-16 w-16 items-center justify-center rounded-2xl border border-app-accent">
-            <CheckCheck color="#00b37e" size={32} />
+            {editing && taskId ? (
+              <Pressable
+                onPress={async () => {
+                  await deleteTask.mutateAsync(taskId);
+                  navigation.popToTop();
+                }}
+                className="h-12 w-12 items-end justify-center"
+              >
+                <Trash2 color="#ffffff" size={18} />
+              </Pressable>
+            ) : (
+              <View className="h-12 w-12" />
+            )}
           </View>
-          <Text className="mt-6 text-[32px] font-bold text-white">
-            {editing ? 'Editar tarefa' : 'Nova tarefa'}
-          </Text>
-          <Text className="mt-2 text-sm text-app-muted">crie seu time para gerenciar as tarefas</Text>
-        </View>
 
-        <View className="mt-10">
-          {editing && !currentTask && !isLoading ? (
-            <EmptyState
-              title="Tarefa não encontrada"
-              description="Não foi possível carregar essa tarefa para edição."
-            />
-          ) : (
-            <TaskForm
-              teams={teams}
-              defaultValues={defaultValues}
-              submitLabel={editing ? 'Salvar' : 'Criar'}
-              onSubmit={handleSubmit}
-              loading={createTask.isPending || updateTask.isPending}
-            />
-          )}
+          <View className="mt-10 items-center">
+            <View className="h-16 w-16 items-center justify-center rounded-2xl border border-app-accent">
+              <CheckCheck color="#00b37e" size={32} />
+            </View>
+            <Text className="mt-6 text-[32px] font-bold text-white">
+              {editing ? 'Editar tarefa' : 'Nova tarefa'}
+            </Text>
+            <Text className="mt-2 text-sm text-app-muted">crie seu time para gerenciar as tarefas</Text>
+          </View>
         </View>
+      }
+    >
+      <View className="mt-10">
+        {editing && !currentTask && !isLoading ? (
+          <EmptyState
+            title="Tarefa não encontrada"
+            description="Não foi possível carregar essa tarefa para edição."
+          />
+        ) : (
+          <TaskForm
+            teams={teams}
+            defaultValues={defaultValues}
+            submitLabel={editing ? 'Salvar' : 'Criar'}
+            onSubmit={handleSubmit}
+            loading={createTask.isPending || updateTask.isPending}
+          />
+        )}
       </View>
     </Screen>
   );

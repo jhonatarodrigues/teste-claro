@@ -30,32 +30,37 @@ export function TaskDetailsScreen({ navigation, route }: Props) {
   const task = taskResponse?.data;
 
   return (
-    <Screen scroll>
-      <View className="pt-4">
-        <View className="flex-row items-center justify-between">
-          <Pressable onPress={() => navigation.goBack()} className="h-12 w-12 items-start justify-center">
-            <ChevronLeft color="#ffffff" size={20} />
-          </Pressable>
-          <Pressable
-            onPress={() =>
-              Alert.alert('Excluir tarefa', 'Deseja remover essa tarefa?', [
-                { text: 'Cancelar', style: 'cancel' },
-                {
-                  text: 'Excluir',
-                  style: 'destructive',
-                  onPress: async () => {
-                    await deleteTask.mutateAsync(taskId);
-                    navigation.goBack();
+    <Screen
+      scroll
+      header={
+        <View className="pt-4">
+          <View className="flex-row items-center justify-between">
+            <Pressable onPress={() => navigation.goBack()} className="h-12 w-12 items-start justify-center">
+              <ChevronLeft color="#ffffff" size={20} />
+            </Pressable>
+            <Pressable
+              onPress={() =>
+                Alert.alert('Excluir tarefa', 'Deseja remover essa tarefa?', [
+                  { text: 'Cancelar', style: 'cancel' },
+                  {
+                    text: 'Excluir',
+                    style: 'destructive',
+                    onPress: async () => {
+                      await deleteTask.mutateAsync(taskId);
+                      navigation.goBack();
+                    },
                   },
-                },
-              ])
-            }
-            className="h-12 w-12 items-end justify-center"
-          >
-            <Trash2 color="#ffffff" size={18} />
-          </Pressable>
+                ])
+              }
+              className="h-12 w-12 items-end justify-center"
+            >
+              <Trash2 color="#ffffff" size={18} />
+            </Pressable>
+          </View>
         </View>
-
+      }
+    >
+      <View>
         {!task && !isLoading ? (
           <View className="mt-10">
             <EmptyState

@@ -1,9 +1,9 @@
 import { taskFormSchema } from '../TaskForm';
 
 describe('taskFormSchema', () => {
-  it('falha quando o título tem menos de 3 caracteres', () => {
+  it('fails when the title has fewer than 3 characters', () => {
     const result = taskFormSchema.safeParse({
-      title: 'Oi',
+      title: 'Hi',
       description: '',
       status: 'Pendente',
       dueDate: '',
@@ -13,9 +13,9 @@ describe('taskFormSchema', () => {
     expect(result.success).toBe(false);
   });
 
-  it('aceita o payload mínimo válido', () => {
+  it('accepts the minimum valid payload', () => {
     const result = taskFormSchema.safeParse({
-      title: 'Nova tarefa',
+      title: 'New task',
       description: '',
       status: 'Pendente',
       dueDate: '',

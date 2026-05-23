@@ -21,8 +21,8 @@ jest.mock('../../hooks/useTasks', () => ({
       data: [
         {
           id: 'task-1',
-          title: 'Título da tarefa',
-          description: 'Descrição longa',
+          title: 'Task title',
+          description: 'Long description',
           status: 'Pendente',
           teamIds: ['team-1'],
         },
@@ -38,7 +38,7 @@ jest.mock('../../hooks/useTeams', () => ({
       data: [
         {
           id: 'team-1',
-          name: 'Time A',
+          name: 'Team A',
           colorHex: '#8BFF3D',
         },
       ],
@@ -48,7 +48,7 @@ jest.mock('../../hooks/useTeams', () => ({
 }));
 
 describe('TasksScreen', () => {
-  it('renderiza tarefas mockadas na tela principal', () => {
+  it('renders mocked tasks on the main screen', () => {
     const { getByText, getAllByText } = render(
       <TasksScreen
         navigation={{
@@ -60,8 +60,8 @@ describe('TasksScreen', () => {
     );
 
     expect(getByText('Tarefas')).toBeTruthy();
-    expect(getByText('Título da tarefa')).toBeTruthy();
-    expect(getAllByText('Time A').length).toBeGreaterThan(0);
+    expect(getByText('Task title')).toBeTruthy();
+    expect(getAllByText('Team A').length).toBeGreaterThan(0);
     expect(getByText('Nova Tarefa')).toBeTruthy();
   });
 });

@@ -1,7 +1,7 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { Search, UsersRound } from 'lucide-react-native';
+import { Search } from 'lucide-react-native';
 import { useMemo, useState } from 'react';
-import { Pressable, Text, TextInput, View } from 'react-native';
+import { TextInput, View } from 'react-native';
 
 import { TeamCard } from '../components/teams/TeamCard';
 import { Button } from '../components/ui/Button';
@@ -32,10 +32,15 @@ export function TeamsScreen({ navigation }: Props) {
   const teams = teamsResponse?.data ?? [];
 
   return (
-    <Screen withBottomSpace={false}>
-      <View className="flex-1 pt-16">
-        <SectionTitle title="Times" subtitle="Acesse um dos times" />
-
+    <Screen
+      scroll
+      header={
+        <View className="pt-16">
+          <SectionTitle title="Times" subtitle="Acesse um dos times" />
+        </View>
+      }
+    >
+      <View>
         <View className="mt-8 h-12 flex-row items-center rounded-xl bg-app-input px-4">
           <TextInput
             value={search}
@@ -62,9 +67,9 @@ export function TeamsScreen({ navigation }: Props) {
           )}
         </View>
 
-        <View className="flex-1" />
-
-        <Button title="Criar time" onPress={() => navigation.navigate('TeamForm')} />
+        <View className="mt-6">
+          <Button title="Criar time" onPress={() => navigation.navigate('TeamForm')} />
+        </View>
       </View>
     </Screen>
   );

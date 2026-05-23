@@ -1,6 +1,6 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ChevronLeft } from 'lucide-react-native';
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 
 import { TaskCard } from '../components/tasks/TaskCard';
 import { TaskFilterBar } from '../components/tasks/TaskFilterBar';
@@ -26,16 +26,21 @@ export function TasksScreen({ navigation, route }: Props) {
   const tasks = tasksResponse?.data ?? [];
 
   return (
-    <Screen withBottomSpace={false}>
-      <View className="flex-1 pt-4">
-        <Pressable onPress={() => navigation.goBack()} className="h-12 w-12 items-start justify-center">
-          <ChevronLeft color="#ffffff" size={20} />
-        </Pressable>
+    <Screen
+      scroll
+      header={
+        <View className="pt-4">
+          <Pressable onPress={() => navigation.goBack()} className="h-12 w-12 items-start justify-center">
+            <ChevronLeft color="#ffffff" size={20} />
+          </Pressable>
 
-        <View className="mt-6">
-          <SectionTitle title="Tarefas" subtitle="adicione a galera e separe os times" />
+          <View className="mt-6">
+            <SectionTitle title="Tarefas" subtitle="adicione a galera e separe os times" />
+          </View>
         </View>
-
+      }
+    >
+      <View>
         <View className="mt-8">
           <TeamHorizontalList teams={teams} activeTeamId={teamId} onSelect={setTeamId} />
         </View>
@@ -70,9 +75,9 @@ export function TasksScreen({ navigation, route }: Props) {
           )}
         </View>
 
-        <View className="flex-1" />
-
-        <Button title="Nova Tarefa" onPress={() => navigation.navigate('TaskForm', { teamId })} />
+        <View className="mt-6">
+          <Button title="Nova Tarefa" onPress={() => navigation.navigate('TaskForm', { teamId })} />
+        </View>
       </View>
     </Screen>
   );
