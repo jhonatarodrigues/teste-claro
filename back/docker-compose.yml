@@ -1,0 +1,44 @@
+services:
+  db:
+    image: mysql:8.4
+    container_name: claro-back-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: claro
+      MYSQL_USER: claro
+      MYSQL_PASSWORD: claro
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    volumes:
+      - claro_mysql_data:/var/lib/mysql
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: claro-back-api
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: development
+      PORT: 3333
+      DATABASE_URL: mysql://claro:claro@db:3306/claro
+      LOG_LEVEL: info
+    ports:
+      - "3333:3333"
+    volumes:
+      - .:/app
+      - claro_back_node_modules:/app/node_modules
+    command: sh -c "pnpm install && pnpm prisma:generate && pnpm prisma:migrate:deploy && pnpm prisma:seed && pnpm dev"
+
+volumes:
+  claro_mysql_data:
+  claro_back_node_modules:
