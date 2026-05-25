@@ -85,5 +85,15 @@ export async function deleteTeam(id: string) {
     throw new AppError(404, 'TEAM_NOT_FOUND', 'Team not found');
   }
 
-  await prisma.team.delete({ where: { id } });
+  await prisma.$transaction(async (transaction) => {
+    await transaction.taskTeam.deleteMany({
+      where: {
+        teamId: id,
+      },
+    });
+
+    await transaction.team.delete({
+      where: { id },
+    });
+  });
 }

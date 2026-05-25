@@ -4,8 +4,13 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const prismaMocks = vi.hoisted(() => ({
   teamFindMany: vi.fn(),
   teamCount: vi.fn(),
+  teamFindUnique: vi.fn(),
+  teamDelete: vi.fn(),
   taskFindMany: vi.fn(),
   taskCount: vi.fn(),
+  taskDelete: vi.fn(),
+  taskTeamDeleteMany: vi.fn(),
+  transaction: vi.fn(),
 }));
 
 vi.mock('../../lib/prisma', () => ({
@@ -14,9 +19,9 @@ vi.mock('../../lib/prisma', () => ({
       findMany: prismaMocks.teamFindMany,
       count: prismaMocks.teamCount,
       create: vi.fn(),
-      findUnique: vi.fn(),
+      findUnique: prismaMocks.teamFindUnique,
       update: vi.fn(),
-      delete: vi.fn(),
+      delete: prismaMocks.teamDelete,
     },
     task: {
       findMany: prismaMocks.taskFindMany,
@@ -24,13 +29,13 @@ vi.mock('../../lib/prisma', () => ({
       create: vi.fn(),
       findUnique: vi.fn(),
       update: vi.fn(),
-      delete: vi.fn(),
+      delete: prismaMocks.taskDelete,
     },
     taskTeam: {
-      deleteMany: vi.fn(),
+      deleteMany: prismaMocks.taskTeamDeleteMany,
       createMany: vi.fn(),
     },
-    $transaction: vi.fn(async (operations: unknown[]) => Promise.all(operations as Promise<unknown>[])),
+    $transaction: prismaMocks.transaction,
   },
 }));
 
@@ -39,6 +44,20 @@ import { app } from '../../app';
 describe('app bootstrap', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    prismaMocks.transaction.mockImplementation(async (operationsOrCallback: unknown) => {
+      if (typeof operationsOrCallback === 'function') {
+        return operationsOrCallback({
+          team: {
+            delete: prismaMocks.teamDelete,
+          },
+          taskTeam: {
+            deleteMany: prismaMocks.taskTeamDeleteMany,
+          },
+        });
+      }
+
+      return Promise.all(operationsOrCallback as Promise<unknown>[]);
+    });
   });
 
   it('returns teams with data and meta', async () => {
@@ -137,5 +156,44 @@ describe('app bootstrap', () => {
     expect(response.body.error.code).toBe('VALIDATION_ERROR');
     expect(response.body.error.message).toBe('Invalid request data');
     expect(response.body.error.details).toBeDefined();
+  });
+
+  it('unlinks task relations before deleting a team without deleting tasks', async () => {
+    prismaMocks.teamFindUnique.mockResolvedValue({
+      id: 'team-1',
+      name: 'Team A',
+      colorHex: '#8BFF3D',
+      description: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+    prismaMocks.taskTeamDeleteMany.mockResolvedValue({ count: 2 });
+    prismaMocks.teamDelete.mockResolvedValue({
+      id: 'team-1',
+      name: 'Team A',
+      colorHex: '#8BFF3D',
+      description: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+
+    const response = await request(app).delete('/api/teams/team-1');
+
+    expect(response.status).toBe(204);
+    expect(prismaMocks.transaction).toHaveBeenCalledTimes(1);
+    expect(prismaMocks.taskTeamDeleteMany).toHaveBeenCalledWith({
+      where: {
+        teamId: 'team-1',
+      },
+    });
+    expect(prismaMocks.teamDelete).toHaveBeenCalledWith({
+      where: {
+        id: 'team-1',
+      },
+    });
+    expect(prismaMocks.taskTeamDeleteMany.mock.invocationCallOrder[0]).toBeLessThan(
+      prismaMocks.teamDelete.mock.invocationCallOrder[0],
+    );
+    expect(prismaMocks.taskDelete).not.toHaveBeenCalled();
   });
 });
