@@ -3,9 +3,9 @@ import { Alert } from 'react-native';
 
 import { TeamFormScreen } from '../TeamFormScreen';
 
-const createTeamMutateAsync = jest.fn();
-const updateTeamMutateAsync = jest.fn();
-const removeTeamMutateAsync = jest.fn();
+const mockCreateTeamMutateAsync = jest.fn();
+const mockUpdateTeamMutateAsync = jest.fn();
+const mockRemoveTeamMutateAsync = jest.fn();
 
 jest.mock('../../hooks/useTeam', () => ({
   useTeam: jest.fn(),
@@ -14,15 +14,15 @@ jest.mock('../../hooks/useTeam', () => ({
 jest.mock('../../hooks/useTeamMutations', () => ({
   useTeamMutations: () => ({
     createTeam: {
-      mutateAsync: createTeamMutateAsync,
+      mutateAsync: mockCreateTeamMutateAsync,
       isPending: false,
     },
     updateTeam: {
-      mutateAsync: updateTeamMutateAsync,
+      mutateAsync: mockUpdateTeamMutateAsync,
       isPending: false,
     },
     removeTeam: {
-      mutateAsync: removeTeamMutateAsync,
+      mutateAsync: mockRemoveTeamMutateAsync,
       isPending: false,
     },
   }),
@@ -78,7 +78,7 @@ describe('TeamFormScreen', () => {
     fireEvent.press(getByText('Salvar'));
 
     await waitFor(() => {
-      expect(updateTeamMutateAsync).toHaveBeenCalledWith({
+      expect(mockUpdateTeamMutateAsync).toHaveBeenCalledWith({
         id: 'team-1',
         input: {
           name: 'Existing Team',
@@ -128,7 +128,7 @@ describe('TeamFormScreen', () => {
     await confirmAction?.onPress?.();
 
     await waitFor(() => {
-      expect(removeTeamMutateAsync).toHaveBeenCalledWith('team-1');
+      expect(mockRemoveTeamMutateAsync).toHaveBeenCalledWith('team-1');
       expect(navigation.goBack).toHaveBeenCalled();
     });
 

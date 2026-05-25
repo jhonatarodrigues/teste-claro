@@ -5,7 +5,7 @@ export type RootStackParamList = {
   Tasks: { teamId?: string; teamName?: string } | undefined;
   TaskDetails: { taskId: string };
   TaskForm: { taskId?: string; teamId?: string } | undefined;
-  TeamForm: undefined;
+  TeamForm: { teamId?: string } | undefined;
 };
 
 export type TaskFormValues = {
