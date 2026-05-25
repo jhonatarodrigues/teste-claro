@@ -1,14 +1,14 @@
 import { Router } from 'express';
 
-import { validate } from '../../middlewares/validate';
+import { validate } from '../../../middlewares/validate';
 import {
   createTeamController,
   deleteTeamController,
   getTeamByIdController,
   listTeamsController,
   updateTeamController,
-} from './teams.controller';
-import { createTeamBodySchema, listTeamsQuerySchema, teamParamsSchema, updateTeamBodySchema } from './teams.schema';
+} from '../controller/teams.controller';
+import { createTeamBodySchema, listTeamsQuerySchema, teamParamsSchema, updateTeamBodySchema } from '../schema/teams.schema';
 
 export const teamsRouter = Router();
 

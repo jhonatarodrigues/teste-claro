@@ -6,8 +6,8 @@ import pinoHttp from 'pino-http';
 import { logger } from './lib/logger';
 import { errorHandler } from './middlewares/error-handler';
 import { notFound } from './middlewares/not-found';
-import { tasksRouter } from './modules/tasks/tasks.routes';
-import { teamsRouter } from './modules/teams/teams.routes';
+import { tasksRouter } from './modules/tasks/routes/tasks.routes';
+import { teamsRouter } from './modules/teams/routes/teams.routes';
 
 export const app = express();
 

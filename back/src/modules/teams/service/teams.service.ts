@@ -1,8 +1,8 @@
-import { prisma } from '../../lib/prisma';
-import { normalizePagination } from '../../utils/pagination';
-import { AppError } from '../../utils/app-error';
-import { CreateTeamBody, ListTeamsQuery, UpdateTeamBody } from './teams.schema';
-import { toTeamResponse } from './teams.mapper';
+import { prisma } from '../../../lib/prisma';
+import { AppError } from '../../../utils/app-error';
+import { normalizePagination } from '../../../utils/pagination';
+import { toTeamResponse } from '../mapper/teams.mapper';
+import { CreateTeamBody, ListTeamsQuery, UpdateTeamBody } from '../schema/teams.schema';
 
 export async function listTeams(query: ListTeamsQuery) {
   const { limit, offset } = normalizePagination(query);

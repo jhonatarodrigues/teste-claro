@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 
-import { ok, withMeta } from '../../utils/api-response';
-import { createTeam, deleteTeam, getTeamById, listTeams, updateTeam } from './teams.service';
-import { CreateTeamBody, ListTeamsQuery, UpdateTeamBody } from './teams.schema';
+import { ok, withMeta } from '../../../utils/api-response';
+import { createTeam, deleteTeam, getTeamById, listTeams, updateTeam } from '../service/teams.service';
+import { CreateTeamBody, ListTeamsQuery, UpdateTeamBody } from '../schema/teams.schema';
 
 export async function listTeamsController(request: Request, response: Response) {
   const result = await listTeams((request.validated?.query ?? request.query) as ListTeamsQuery);

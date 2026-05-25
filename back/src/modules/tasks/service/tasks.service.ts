@@ -1,9 +1,9 @@
-import { prisma } from '../../lib/prisma';
-import { AppError } from '../../utils/app-error';
-import { normalizePagination } from '../../utils/pagination';
-import { apiStatusToPrisma, buildTaskOrderBy, buildTaskWhere } from '../../utils/prisma-filters';
-import { CreateTaskBody, ListTasksQuery, UpdateTaskBody } from './tasks.schema';
-import { toTaskResponse } from './tasks.mapper';
+import { prisma } from '../../../lib/prisma';
+import { AppError } from '../../../utils/app-error';
+import { normalizePagination } from '../../../utils/pagination';
+import { apiStatusToPrisma, buildTaskOrderBy, buildTaskWhere } from '../../../utils/prisma-filters';
+import { toTaskResponse } from '../mapper/tasks.mapper';
+import { CreateTaskBody, ListTasksQuery, UpdateTaskBody } from '../schema/tasks.schema';
 
 export async function listTasks(query: ListTasksQuery) {
   const { limit, offset } = normalizePagination(query);

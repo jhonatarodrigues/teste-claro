@@ -1,14 +1,14 @@
 import { Router } from 'express';
 
-import { validate } from '../../middlewares/validate';
+import { validate } from '../../../middlewares/validate';
 import {
   createTaskController,
   deleteTaskController,
   getTaskByIdController,
   listTasksController,
   updateTaskController,
-} from './tasks.controller';
-import { createTaskBodySchema, listTasksQuerySchema, taskParamsSchema, updateTaskBodySchema } from './tasks.schema';
+} from '../controller/tasks.controller';
+import { createTaskBodySchema, listTasksQuerySchema, taskParamsSchema, updateTaskBodySchema } from '../schema/tasks.schema';
 
 export const tasksRouter = Router();
 

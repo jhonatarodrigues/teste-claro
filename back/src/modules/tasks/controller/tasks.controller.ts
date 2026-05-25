@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 
-import { ok, withMeta } from '../../utils/api-response';
-import { CreateTaskBody, ListTasksQuery, UpdateTaskBody } from './tasks.schema';
-import { createTask, deleteTask, getTaskById, listTasks, updateTask } from './tasks.service';
+import { ok, withMeta } from '../../../utils/api-response';
+import { createTask, deleteTask, getTaskById, listTasks, updateTask } from '../service/tasks.service';
+import { CreateTaskBody, ListTasksQuery, UpdateTaskBody } from '../schema/tasks.schema';
 
 export async function listTasksController(request: Request, response: Response) {
   const result = await listTasks((request.validated?.query ?? request.query) as ListTasksQuery);
