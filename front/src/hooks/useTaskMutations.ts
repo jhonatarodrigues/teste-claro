@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { repositories } from '../repositories';
-import { CreateTaskInput } from '../repositories/contracts/task-repository';
+import { CreateTaskInput, UpdateTaskInput } from '../repositories/contracts/task-repository';
 import { TaskStatus } from '../types/task';
 
 export function useTaskMutations() {
@@ -24,7 +24,7 @@ export function useTaskMutations() {
   });
 
   const updateTask = useMutation({
-    mutationFn: ({ id, input }: { id: string; input: CreateTaskInput }) =>
+    mutationFn: ({ id, input }: { id: string; input: UpdateTaskInput }) =>
       repositories.tasks.update(id, input),
     onSuccess: invalidate,
   });

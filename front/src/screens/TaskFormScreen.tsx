@@ -1,6 +1,6 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { CheckCheck, ChevronLeft, Trash2 } from 'lucide-react-native';
-import { Pressable, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, Text, View } from 'react-native';
 
 import { TaskForm, TaskFormData } from '../components/tasks/TaskForm';
 import { EmptyState } from '../components/ui/EmptyState';
@@ -60,13 +60,23 @@ export function TaskFormScreen({ navigation, route }: Props) {
             </Pressable>
             {editing && taskId ? (
               <Pressable
-                onPress={async () => {
-                  await deleteTask.mutateAsync(taskId);
-                  navigation.popToTop();
-                }}
+                onPress={
+                  deleteTask.isPending
+                    ? undefined
+                    : async () => {
+                        await deleteTask.mutateAsync(taskId);
+                        navigation.popToTop();
+                      }
+                }
+                disabled={deleteTask.isPending}
+                testID="task-delete-action"
                 className="h-12 w-12 items-end justify-center"
               >
-                <Trash2 color="#ffffff" size={18} />
+                {deleteTask.isPending ? (
+                  <ActivityIndicator testID="task-delete-loading" color="#ffffff" size="small" />
+                ) : (
+                  <Trash2 color="#ffffff" size={18} />
+                )}
               </Pressable>
             ) : (
               <View className="h-12 w-12" />

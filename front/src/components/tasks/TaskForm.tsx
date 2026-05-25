@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { Text, View } from 'react-native';
 import { z } from 'zod';
@@ -52,11 +52,16 @@ export function TaskForm({
   const {
     control,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<TaskFormData>({
     resolver: zodResolver(taskFormSchema),
     defaultValues: fallbackValues,
   });
+
+  useEffect(() => {
+    reset(fallbackValues);
+  }, [fallbackValues, reset]);
 
   return (
     <View className="gap-4">

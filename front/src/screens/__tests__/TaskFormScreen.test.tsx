@@ -3,6 +3,8 @@ import { render, waitFor } from '@testing-library/react-native';
 import { TaskFormScreen } from '../TaskFormScreen';
 
 const mockUpdateTaskMutateAsync = jest.fn();
+const mockDeleteTaskMutateAsync = jest.fn();
+let mockDeleteTaskPending = false;
 let mockTaskFormProps:
   | {
       submitLabel: string;
@@ -36,8 +38,8 @@ jest.mock('../../hooks/useTaskMutations', () => ({
       isPending: false,
     },
     deleteTask: {
-      mutateAsync: jest.fn(),
-      isPending: false,
+      mutateAsync: mockDeleteTaskMutateAsync,
+      isPending: mockDeleteTaskPending,
     },
   }),
 }));
@@ -61,6 +63,7 @@ describe('TaskFormScreen', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockTaskFormProps = undefined;
+    mockDeleteTaskPending = false;
 
     useTeams.mockReturnValue({
       data: {
@@ -115,5 +118,23 @@ describe('TaskFormScreen', () => {
       });
       expect(navigation.goBack).toHaveBeenCalled();
     });
+  });
+
+  it('shows a loading state while deleting a task', () => {
+    mockDeleteTaskPending = true;
+
+    const navigation = {
+      goBack: jest.fn(),
+      popToTop: jest.fn(),
+    };
+
+    const { getByTestId } = render(
+      <TaskFormScreen
+        navigation={navigation as never}
+        route={{ key: 'TaskForm', name: 'TaskForm', params: { taskId: 'task-1' } } as never}
+      />,
+    );
+
+    expect(getByTestId('task-delete-loading')).toBeTruthy();
   });
 });
