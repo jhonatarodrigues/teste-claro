@@ -12,6 +12,9 @@ export function useTaskMutations() {
       queryClient.invalidateQueries({ queryKey: ['tasks'] }),
       queryClient.invalidateQueries({ queryKey: ['teams'] }),
       queryClient.invalidateQueries({ queryKey: ['task'] }),
+      queryClient.refetchQueries({ queryKey: ['tasks'], type: 'all' }),
+      queryClient.refetchQueries({ queryKey: ['teams'], type: 'all' }),
+      queryClient.refetchQueries({ queryKey: ['task'], type: 'all' }),
     ]);
   };
 
