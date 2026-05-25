@@ -11,6 +11,7 @@ export function useTaskMutations() {
     await Promise.all([
       queryClient.invalidateQueries({ queryKey: ['tasks'] }),
       queryClient.invalidateQueries({ queryKey: ['teams'] }),
+      queryClient.invalidateQueries({ queryKey: ['task'] }),
     ]);
   };
 
