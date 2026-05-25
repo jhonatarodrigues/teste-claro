@@ -1,6 +1,6 @@
 import { ApiItemResponse, ApiListResponse } from '../../types/api';
 import { Task } from '../../types/task';
-import { CreateTaskInput, TaskRepository } from '../contracts/task-repository';
+import { CreateTaskInput, TaskRepository, UpdateTaskInput } from '../contracts/task-repository';
 import { createId, mockTasks } from './mock-db';
 
 export const mockTaskRepository: TaskRepository = {
@@ -73,7 +73,7 @@ export const mockTaskRepository: TaskRepository = {
     return { data: task };
   },
 
-  async update(id: string, input: CreateTaskInput): Promise<ApiItemResponse<Task>> {
+  async update(id: string, input: UpdateTaskInput): Promise<ApiItemResponse<Task>> {
     const taskIndex = mockTasks.findIndex((item) => item.id === id);
 
     if (taskIndex < 0) {

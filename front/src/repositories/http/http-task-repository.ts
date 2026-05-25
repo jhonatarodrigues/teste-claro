@@ -1,7 +1,7 @@
 import { stripUndefined } from '../../lib/http/strip-undefined';
 import { ApiItemResponse, ApiListResponse } from '../../types/api';
 import { Task } from '../../types/task';
-import { CreateTaskInput, TaskRepository } from '../contracts/task-repository';
+import { CreateTaskInput, TaskRepository, UpdateTaskInput } from '../contracts/task-repository';
 import { createHttpClient, HttpClient } from './http-client';
 
 type ApiTask = Omit<Task, 'description' | 'dueDate'> & {
@@ -39,7 +39,7 @@ function normalizeDueDate(dueDate?: string) {
   return trimmed ? trimmed : undefined;
 }
 
-function normalizeTaskInput(input: CreateTaskInput) {
+function normalizeTaskInput(input: CreateTaskInput | UpdateTaskInput) {
   return stripUndefined({
     ...input,
     dueDate: normalizeDueDate(input.dueDate),
@@ -63,7 +63,7 @@ export function createHttpTaskRepository(client: HttpClient = createHttpClient()
       return normalizeTaskItemResponse(response);
     },
 
-    async update(id: string, input: CreateTaskInput): Promise<ApiItemResponse<Task>> {
+    async update(id: string, input: UpdateTaskInput): Promise<ApiItemResponse<Task>> {
       const response = await client.put<ApiItemResponse<ApiTask>>(`/tasks/${id}`, normalizeTaskInput(input));
       return normalizeTaskItemResponse(response);
     },

@@ -26,6 +26,7 @@ type TaskFormProps = {
   submitLabel: string;
   onSubmit: (values: TaskFormData) => void;
   loading?: boolean;
+  statusOnlyEdit?: boolean;
 };
 
 export function TaskForm({
@@ -34,6 +35,7 @@ export function TaskForm({
   submitLabel,
   onSubmit,
   loading = false,
+  statusOnlyEdit = false,
 }: TaskFormProps) {
   const fallbackValues = useMemo<TaskFormData>(
     () => ({
@@ -66,6 +68,7 @@ export function TaskForm({
             placeholder="Título"
             value={value}
             onChangeText={onChange}
+            editable={!statusOnlyEdit}
             error={errors.title?.message}
           />
         )}
@@ -80,6 +83,7 @@ export function TaskForm({
             placeholder="Descrição"
             value={value}
             onChangeText={onChange}
+            editable={!statusOnlyEdit}
             error={errors.description?.message}
           />
         )}
@@ -96,6 +100,7 @@ export function TaskForm({
             onChange={() => undefined}
             onMultiChange={onChange}
             options={teams.map((team) => ({ label: team.name, value: team.id }))}
+            disabled={statusOnlyEdit}
             error={errors.teamIds?.message}
           />
         )}

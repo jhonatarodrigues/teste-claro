@@ -17,6 +17,7 @@ type SelectProps = {
   onMultiChange?: (values: string[]) => void;
   error?: string;
   multiple?: boolean;
+  disabled?: boolean;
 };
 
 export function Select({
@@ -29,6 +30,7 @@ export function Select({
   onMultiChange,
   error,
   multiple = false,
+  disabled = false,
 }: SelectProps) {
   const [visible, setVisible] = useState(false);
 
@@ -61,8 +63,11 @@ export function Select({
     <View className="gap-2">
       {label ? <Text className="text-sm text-app-muted">{label}</Text> : null}
       <Pressable
-        onPress={() => setVisible(true)}
-        className="h-12 flex-row items-center justify-between rounded-xl bg-app-input px-4"
+        onPress={disabled ? undefined : () => setVisible(true)}
+        disabled={disabled}
+        className={`h-12 flex-row items-center justify-between rounded-xl px-4 ${
+          disabled ? 'bg-app-surface opacity-70' : 'bg-app-input'
+        }`}
       >
         <Text className={`${displayValue === placeholder ? 'text-[#63636f]' : 'text-white'}`}>
           {displayValue}

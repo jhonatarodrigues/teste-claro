@@ -41,7 +41,7 @@ export function TaskFormScreen({ navigation, route }: Props) {
 
   const handleSubmit = async (values: TaskFormData) => {
     if (editing && taskId) {
-      await updateTask.mutateAsync({ id: taskId, input: values });
+      await updateTask.mutateAsync({ id: taskId, input: { status: values.status } });
     } else {
       await createTask.mutateAsync(values);
     }
@@ -98,6 +98,7 @@ export function TaskFormScreen({ navigation, route }: Props) {
             submitLabel={editing ? 'Salvar' : 'Criar'}
             onSubmit={handleSubmit}
             loading={createTask.isPending || updateTask.isPending}
+            statusOnlyEdit={editing}
           />
         )}
       </View>
