@@ -4,6 +4,12 @@ export type ApiMeta = {
   offset: number;
 };
 
+export type ApiError = {
+  code: string;
+  message: string;
+  details?: unknown;
+};
+
 export type ApiListResponse<T> = {
   data: T[];
   meta: ApiMeta;
@@ -11,4 +17,8 @@ export type ApiListResponse<T> = {
 
 export type ApiItemResponse<T> = {
   data: T;
+};
+
+export type ApiErrorResponse = {
+  error: ApiError;
 };
