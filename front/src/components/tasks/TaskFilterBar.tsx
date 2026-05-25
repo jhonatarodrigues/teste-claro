@@ -26,15 +26,33 @@ export function TaskFilterBar({
 }: TaskFilterBarProps) {
   return (
     <View className="gap-3">
-      <View className="h-12 flex-row items-center rounded-xl bg-app-input px-4">
-        <TextInput
-          value={search}
-          onChangeText={onSearchChange}
-          placeholder="Busque uma tarefa"
-          placeholderTextColor="#63636f"
-          className="flex-1 text-white"
-        />
-        <Search size={18} color="#00b37e" />
+      <View testID="task-filter-primary-row" className="flex-row items-start gap-3">
+        <View testID="task-filter-search-wrapper" className="flex-1">
+          <View className="h-12 flex-row items-center rounded-xl bg-app-input px-4">
+            <TextInput
+              value={search}
+              onChangeText={onSearchChange}
+              placeholder="Busque uma tarefa"
+              placeholderTextColor="#63636f"
+              className="flex-1 text-white"
+            />
+            <Search size={18} color="#00b37e" />
+          </View>
+        </View>
+
+        <View testID="task-filter-status-wrapper" className="w-[44%]">
+          <Select
+            placeholder="Filtrar por status"
+            value={status}
+            options={[
+              { label: 'Todos os status', value: '__all__' },
+              { label: 'Pendente', value: 'Pendente' },
+              { label: 'Em Progresso', value: 'Em Progresso' },
+              { label: 'Concluida', value: 'Concluida' },
+            ]}
+            onChange={(value) => onStatusChange(value === '__all__' ? undefined : (value as TaskStatus))}
+          />
+        </View>
       </View>
 
       <Select
@@ -45,18 +63,6 @@ export function TaskFilterBar({
           ...teams.map((team) => ({ label: team.name, value: team.id })),
         ]}
         onChange={(value) => onTeamChange(value === '__all__' ? undefined : value)}
-      />
-
-      <Select
-        placeholder="Filtrar por status"
-        value={status}
-        options={[
-          { label: 'Todos os status', value: '__all__' },
-          { label: 'Pendente', value: 'Pendente' },
-          { label: 'Em Progresso', value: 'Em Progresso' },
-          { label: 'Concluida', value: 'Concluida' },
-        ]}
-        onChange={(value) => onStatusChange(value === '__all__' ? undefined : (value as TaskStatus))}
       />
     </View>
   );

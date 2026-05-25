@@ -4,9 +4,10 @@ import { Alert } from 'react-native';
 import { TeamsScreen } from '../TeamsScreen';
 
 const mockRemoveTeamMutateAsync = jest.fn();
+const mockFetchNextTeamsPage = jest.fn();
 
-jest.mock('../../hooks/useTeams', () => ({
-  useTeams: jest.fn(),
+jest.mock('../../hooks/useInfiniteTeams', () => ({
+  useInfiniteTeams: jest.fn(),
 }));
 
 jest.mock('../../hooks/useTasks', () => ({
@@ -22,8 +23,8 @@ jest.mock('../../hooks/useTeamMutations', () => ({
   }),
 }));
 
-const { useTeams } = jest.requireMock('../../hooks/useTeams') as {
-  useTeams: jest.Mock;
+const { useInfiniteTeams } = jest.requireMock('../../hooks/useInfiniteTeams') as {
+  useInfiniteTeams: jest.Mock;
 };
 
 const { useTasks } = jest.requireMock('../../hooks/useTasks') as {
@@ -34,17 +35,29 @@ describe('TeamsScreen', () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
-    useTeams.mockReturnValue({
+    useInfiniteTeams.mockReturnValue({
       data: {
-        data: [
+        pages: [
           {
-            id: 'team-1',
-            name: 'Team A',
-            colorHex: '#00B37E',
+            data: [
+              {
+                id: 'team-1',
+                name: 'Team A',
+                colorHex: '#00B37E',
+              },
+            ],
+            meta: {
+              total: 2,
+              limit: 10,
+              offset: 0,
+            },
           },
         ],
       },
       isLoading: false,
+      isFetchingNextPage: false,
+      hasNextPage: true,
+      fetchNextPage: mockFetchNextTeamsPage,
     });
 
     useTasks.mockReturnValue({
@@ -122,5 +135,31 @@ describe('TeamsScreen', () => {
     });
 
     alertSpy.mockRestore();
+  });
+
+  it('requests the next page when the teams list reaches the end', () => {
+    const navigation = {
+      navigate: jest.fn(),
+    };
+
+    const { getByTestId } = render(
+      <TeamsScreen navigation={navigation as any} route={{ key: 'Teams', name: 'Teams' } as any} />,
+    );
+
+    getByTestId('teams-list').props.onEndReached();
+
+    expect(mockFetchNextTeamsPage).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps spacing between the search field and the first team card', () => {
+    const navigation = {
+      navigate: jest.fn(),
+    };
+
+    const { getByTestId } = render(
+      <TeamsScreen navigation={navigation as any} route={{ key: 'Teams', name: 'Teams' } as any} />,
+    );
+
+    expect(getByTestId('teams-list-header').props.className).toContain('pb-4');
   });
 });

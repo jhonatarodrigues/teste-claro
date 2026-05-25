@@ -2,9 +2,33 @@ import { render } from '@testing-library/react-native';
 
 import { TasksScreen } from '../TasksScreen';
 
+const mockFetchNextTasksPage = jest.fn();
+let mockInfiniteTasksState: any = {
+  data: {
+    pages: [
+      {
+        data: [
+          {
+            id: 'task-1',
+            title: 'Task title',
+            description: 'Long description',
+            status: 'Pendente',
+            teamIds: ['team-1'],
+          },
+        ],
+        meta: { total: 2, limit: 20, offset: 0 },
+      },
+    ],
+  },
+  fetchNextPage: mockFetchNextTasksPage,
+  hasNextPage: true,
+  isFetchingNextPage: false,
+  isLoading: false,
+};
+
 jest.mock('../../hooks/useTaskFilters', () => ({
   useTaskFilters: () => ({
-    filters: { teamId: undefined, status: undefined, search: '', limit: 20, offset: 0, sort: 'status' },
+    filters: { teamId: undefined, status: undefined, search: '', limit: 20, sort: 'status' },
     teamId: undefined,
     status: undefined,
     search: '',
@@ -15,21 +39,8 @@ jest.mock('../../hooks/useTaskFilters', () => ({
   }),
 }));
 
-jest.mock('../../hooks/useTasks', () => ({
-  useTasks: () => ({
-    data: {
-      data: [
-        {
-          id: 'task-1',
-          title: 'Task title',
-          description: 'Long description',
-          status: 'Pendente',
-          teamIds: ['team-1'],
-        },
-      ],
-      meta: { total: 1, limit: 20, offset: 0 },
-    },
-  }),
+jest.mock('../../hooks/useInfiniteTasks', () => ({
+  useInfiniteTasks: () => mockInfiniteTasksState,
 }));
 
 jest.mock('../../hooks/useTeams', () => ({
@@ -48,6 +59,32 @@ jest.mock('../../hooks/useTeams', () => ({
 }));
 
 describe('TasksScreen', () => {
+  beforeEach(() => {
+    mockFetchNextTasksPage.mockClear();
+    mockInfiniteTasksState = {
+      data: {
+        pages: [
+          {
+            data: [
+              {
+                id: 'task-1',
+                title: 'Task title',
+                description: 'Long description',
+                status: 'Pendente',
+                teamIds: ['team-1'],
+              },
+            ],
+            meta: { total: 2, limit: 20, offset: 0 },
+          },
+        ],
+      },
+      fetchNextPage: mockFetchNextTasksPage,
+      hasNextPage: true,
+      isFetchingNextPage: false,
+      isLoading: false,
+    };
+  });
+
   it('renders mocked tasks on the main screen', () => {
     const { getByText, getAllByText, getByTestId } = render(
       <TasksScreen
@@ -63,6 +100,49 @@ describe('TasksScreen', () => {
     expect(getByText('Task title')).toBeTruthy();
     expect(getAllByText('Team A').length).toBeGreaterThan(0);
     expect(getByText('Nova Tarefa')).toBeTruthy();
+    expect(getByTestId('tasks-collapsible-header')).toBeTruthy();
+    expect(getByTestId('tasks-fixed-carousel')).toBeTruthy();
     expect(getByTestId('tasks-team-carousel-container').props.className).toContain('-mx-5');
+    expect(getByTestId('tasks-list').props.stickyHeaderIndices).toEqual([]);
+    expect(typeof getByTestId('tasks-list').props.onScroll).toBe('function');
+  });
+
+  it('requests the next page when the list reaches the end', () => {
+    const { getByTestId } = render(
+      <TasksScreen
+        navigation={{
+          goBack: jest.fn(),
+          navigate: jest.fn(),
+        } as any}
+        route={{ key: 'Tasks', name: 'Tasks', params: undefined } as any}
+      />,
+    );
+
+    getByTestId('tasks-list').props.onEndReached();
+
+    expect(mockFetchNextTasksPage).toHaveBeenCalledTimes(1);
+  });
+
+  it('shows a loading indicator while the task list is loading', () => {
+    mockInfiniteTasksState = {
+      data: undefined,
+      fetchNextPage: mockFetchNextTasksPage,
+      hasNextPage: false,
+      isFetchingNextPage: false,
+      isLoading: true,
+    };
+
+    const { getByTestId, getByText } = render(
+      <TasksScreen
+        navigation={{
+          goBack: jest.fn(),
+          navigate: jest.fn(),
+        } as any}
+        route={{ key: 'Tasks', name: 'Tasks', params: undefined } as any}
+      />,
+    );
+
+    expect(getByTestId('tasks-loading-indicator')).toBeTruthy();
+    expect(getByText('Carregando tarefas...')).toBeTruthy();
   });
 });
