@@ -10,7 +10,11 @@ type TeamHorizontalListProps = {
 
 export function TeamHorizontalList({ teams, activeTeamId, onSelect }: TeamHorizontalListProps) {
   return (
-    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 12 }}>
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      contentContainerStyle={{ gap: 12, paddingHorizontal: 20 }}
+    >
       <TouchableOpacity
         onPress={() => onSelect(undefined)}
         className={`rounded-full px-4 py-2 ${!activeTeamId ? 'bg-app-accent' : 'bg-app-surface'}`}

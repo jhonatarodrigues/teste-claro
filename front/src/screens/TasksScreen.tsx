@@ -45,7 +45,9 @@ export function TasksScreen({ navigation, route }: Props) {
         </View>
 
         <View className="bg-app-bg px-5 pb-4 pt-8">
-          <TeamHorizontalList teams={teams} activeTeamId={teamId} onSelect={setTeamId} />
+          <View testID="tasks-team-carousel-container" className="-mx-5">
+            <TeamHorizontalList teams={teams} activeTeamId={teamId} onSelect={setTeamId} />
+          </View>
 
           <View className="mt-4">
             <TaskFilterBar

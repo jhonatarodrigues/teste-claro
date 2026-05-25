@@ -49,7 +49,7 @@ jest.mock('../../hooks/useTeams', () => ({
 
 describe('TasksScreen', () => {
   it('renders mocked tasks on the main screen', () => {
-    const { getByText, getAllByText } = render(
+    const { getByText, getAllByText, getByTestId } = render(
       <TasksScreen
         navigation={{
           goBack: jest.fn(),
@@ -63,5 +63,6 @@ describe('TasksScreen', () => {
     expect(getByText('Task title')).toBeTruthy();
     expect(getAllByText('Team A').length).toBeGreaterThan(0);
     expect(getByText('Nova Tarefa')).toBeTruthy();
+    expect(getByTestId('tasks-team-carousel-container').props.className).toContain('-mx-5');
   });
 });

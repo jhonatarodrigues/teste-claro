@@ -1,4 +1,4 @@
-import { render, waitFor } from '@testing-library/react-native';
+import { fireEvent, render, waitFor } from '@testing-library/react-native';
 
 import { TaskFormScreen } from '../TaskFormScreen';
 
@@ -136,5 +136,29 @@ describe('TaskFormScreen', () => {
     );
 
     expect(getByTestId('task-delete-loading')).toBeTruthy();
+  });
+
+  it('returns to the task list instead of popping to the teams screen after delete', async () => {
+    mockDeleteTaskMutateAsync.mockResolvedValueOnce(undefined);
+
+    const navigation = {
+      goBack: jest.fn(),
+      popToTop: jest.fn(),
+    };
+
+    const { getByTestId } = render(
+      <TaskFormScreen
+        navigation={navigation as never}
+        route={{ key: 'TaskForm', name: 'TaskForm', params: { taskId: 'task-1' } } as never}
+      />,
+    );
+
+    fireEvent.press(getByTestId('task-delete-action'));
+
+    await waitFor(() => {
+      expect(mockDeleteTaskMutateAsync).toHaveBeenCalledWith('task-1');
+      expect(navigation.goBack).toHaveBeenCalled();
+      expect(navigation.popToTop).not.toHaveBeenCalled();
+    });
   });
 });

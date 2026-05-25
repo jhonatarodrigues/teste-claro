@@ -65,7 +65,7 @@ export function TaskFormScreen({ navigation, route }: Props) {
                     ? undefined
                     : async () => {
                         await deleteTask.mutateAsync(taskId);
-                        navigation.popToTop();
+                        navigation.goBack();
                       }
                 }
                 disabled={deleteTask.isPending}
