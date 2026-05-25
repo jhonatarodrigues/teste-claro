@@ -17,4 +17,6 @@ export interface TeamRepository {
   list(filters?: TeamFilters): Promise<ApiListResponse<Team>>;
   getById(id: string): Promise<ApiItemResponse<Team>>;
   create(input: CreateTeamInput): Promise<ApiItemResponse<Team>>;
+  update(id: string, input: CreateTeamInput): Promise<ApiItemResponse<Team>>;
+  remove(id: string): Promise<void>;
 }

@@ -5,7 +5,7 @@ import {
   TeamFilters,
   TeamRepository,
 } from '../contracts/team-repository';
-import { createId, mockTeams } from './mock-db';
+import { createId, mockTasks, mockTeams } from './mock-db';
 
 function paginate<T>(items: T[], offset = 0, limit = items.length): ApiListResponse<T> {
   const safeOffset = offset ?? 0;
@@ -52,5 +52,38 @@ export const mockTeamRepository: TeamRepository = {
     mockTeams.unshift(team);
 
     return { data: team };
+  },
+
+  async update(id: string, input: CreateTeamInput): Promise<ApiItemResponse<Team>> {
+    const teamIndex = mockTeams.findIndex((item) => item.id === id);
+
+    if (teamIndex < 0) {
+      throw new Error('Time não encontrado');
+    }
+
+    const updated: Team = {
+      ...mockTeams[teamIndex],
+      name: input.name,
+      colorHex: input.colorHex,
+      description: input.description,
+    };
+
+    mockTeams[teamIndex] = updated;
+
+    return { data: updated };
+  },
+
+  async remove(id: string): Promise<void> {
+    const teamIndex = mockTeams.findIndex((item) => item.id === id);
+
+    if (teamIndex < 0) {
+      throw new Error('Time não encontrado');
+    }
+
+    mockTeams.splice(teamIndex, 1);
+
+    mockTasks.forEach((task) => {
+      task.teamIds = task.teamIds.filter((teamId) => teamId !== id);
+    });
   },
 };
