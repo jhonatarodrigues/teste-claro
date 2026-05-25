@@ -1,13 +1,14 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Search } from 'lucide-react-native';
 import { useMemo, useState } from 'react';
-import { TextInput, View } from 'react-native';
+import { Alert, TextInput, View } from 'react-native';
 
 import { TeamCard } from '../components/teams/TeamCard';
 import { Button } from '../components/ui/Button';
 import { EmptyState } from '../components/ui/EmptyState';
 import { Screen } from '../components/ui/Screen';
 import { SectionTitle } from '../components/ui/SectionTitle';
+import { useTeamMutations } from '../hooks/useTeamMutations';
 import { useTasks } from '../hooks/useTasks';
 import { useTeams } from '../hooks/useTeams';
 import { RootStackParamList } from '../navigation/types';
@@ -16,6 +17,7 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Teams'>;
 
 export function TeamsScreen({ navigation }: Props) {
   const [search, setSearch] = useState('');
+  const { removeTeam } = useTeamMutations();
   const { data: teamsResponse } = useTeams({ search });
   const { data: tasksResponse } = useTasks({ limit: 50, offset: 0 });
 
@@ -60,6 +62,23 @@ export function TeamsScreen({ navigation }: Props) {
                 team={team}
                 tasksCount={tasksByTeam.get(team.id) ?? 0}
                 onPress={() => navigation.navigate('Tasks', { teamId: team.id, teamName: team.name })}
+                onEdit={() => navigation.navigate('TeamForm', { teamId: team.id })}
+                onDelete={() =>
+                  Alert.alert(
+                    'Excluir time',
+                    'As tarefas serão mantidas e o time será desvinculado delas.',
+                    [
+                      { text: 'Cancelar', style: 'cancel' },
+                      {
+                        text: 'Excluir',
+                        style: 'destructive',
+                        onPress: async () => {
+                          await removeTeam.mutateAsync(team.id);
+                        },
+                      },
+                    ],
+                  )
+                }
               />
             ))
           ) : (
