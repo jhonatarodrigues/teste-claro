@@ -1,9 +1,11 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { DrawerActions } from '@react-navigation/native';
 import { Search } from 'lucide-react-native';
 import { useMemo, useState } from 'react';
 import { ActivityIndicator, Alert, FlatList, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { DrawerMenuButton } from '../components/navigation/DrawerMenuButton';
 import { TeamCard } from '../components/teams/TeamCard';
 import { Button } from '../components/ui/Button';
 import { EmptyState } from '../components/ui/EmptyState';
@@ -46,8 +48,15 @@ export function TeamsScreen({ navigation }: Props) {
 
   return (
     <SafeAreaView className="flex-1 bg-app-bg">
-      <View className="bg-app-bg px-5 pt-16">
-        <SectionTitle title="Times" subtitle="Acesse um dos times" />
+      <View className="bg-app-bg px-5 pt-4">
+        <DrawerMenuButton
+          testID="teams-drawer-button"
+          onPress={() => navigation.getParent()?.dispatch(DrawerActions.openDrawer())}
+        />
+
+        <View className="mt-6">
+          <SectionTitle title="Times" subtitle="Acesse um dos times" />
+        </View>
       </View>
 
       <FlatList

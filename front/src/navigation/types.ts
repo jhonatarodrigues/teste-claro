@@ -1,3 +1,5 @@
+import { NavigatorScreenParams } from '@react-navigation/native';
+
 import { TaskStatus } from '../types/task';
 
 export type RootStackParamList = {
@@ -6,6 +8,10 @@ export type RootStackParamList = {
   TaskDetails: { taskId: string };
   TaskForm: { taskId?: string; teamId?: string } | undefined;
   TeamForm: { teamId?: string } | undefined;
+};
+
+export type RootDrawerParamList = {
+  MainStack: NavigatorScreenParams<RootStackParamList> | undefined;
 };
 
 export type TaskFormValues = {

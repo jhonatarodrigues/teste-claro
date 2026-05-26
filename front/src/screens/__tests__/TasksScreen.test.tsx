@@ -1,3 +1,4 @@
+import { DrawerActions } from '@react-navigation/native';
 import { fireEvent, render } from '@testing-library/react-native';
 
 import { TasksScreen } from '../TasksScreen';
@@ -150,5 +151,24 @@ describe('TasksScreen', () => {
 
     expect(getByTestId('tasks-loading-indicator')).toBeTruthy();
     expect(getByText('Carregando tarefas...')).toBeTruthy();
+  });
+
+  it('opens the drawer from the menu button', () => {
+    const dispatch = jest.fn();
+
+    const { getByTestId } = render(
+      <TasksScreen
+        navigation={{
+          goBack: jest.fn(),
+          navigate: jest.fn(),
+          getParent: jest.fn(() => ({ dispatch })),
+        } as any}
+        route={{ key: 'Tasks', name: 'Tasks', params: undefined } as any}
+      />,
+    );
+
+    fireEvent.press(getByTestId('tasks-drawer-button'));
+
+    expect(dispatch).toHaveBeenCalledWith(DrawerActions.openDrawer());
   });
 });

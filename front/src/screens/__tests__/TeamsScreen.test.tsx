@@ -1,3 +1,4 @@
+import { DrawerActions } from '@react-navigation/native';
 import { fireEvent, render, waitFor } from '@testing-library/react-native';
 import { Alert } from 'react-native';
 
@@ -175,5 +176,21 @@ describe('TeamsScreen', () => {
     );
 
     expect(getByTestId('teams-list-header').props.className).toContain('pb-4');
+  });
+
+  it('opens the drawer from the menu button', () => {
+    const dispatch = jest.fn();
+    const navigation = {
+      navigate: jest.fn(),
+      getParent: jest.fn(() => ({ dispatch })),
+    };
+
+    const { getByTestId } = render(
+      <TeamsScreen navigation={navigation as any} route={{ key: 'Teams', name: 'Teams' } as any} />,
+    );
+
+    fireEvent.press(getByTestId('teams-drawer-button'));
+
+    expect(dispatch).toHaveBeenCalledWith(DrawerActions.openDrawer());
   });
 });

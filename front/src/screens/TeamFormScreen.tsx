@@ -1,10 +1,12 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { DrawerActions } from '@react-navigation/native';
 import { ChevronLeft, UsersRound } from 'lucide-react-native';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { ActivityIndicator, Alert, Pressable, Text, View } from 'react-native';
 
+import { DrawerMenuButton } from '../components/navigation/DrawerMenuButton';
 import { Button } from '../components/ui/Button';
 import { ColorPickerField } from '../components/ui/ColorPickerField';
 import { Input } from '../components/ui/Input';
@@ -96,9 +98,15 @@ export function TeamFormScreen({ navigation, route }: Props) {
       scroll
       header={
         <View className="pt-4">
-          <Pressable onPress={() => navigation.goBack()} className="h-12 w-12 items-start justify-center">
-            <ChevronLeft color="#ffffff" size={20} />
-          </Pressable>
+          <View className="flex-row items-center justify-between">
+            <Pressable onPress={() => navigation.goBack()} className="h-12 w-12 items-start justify-center">
+              <ChevronLeft color="#ffffff" size={20} />
+            </Pressable>
+            <DrawerMenuButton
+              testID="team-form-drawer-button"
+              onPress={() => navigation.getParent()?.dispatch(DrawerActions.openDrawer())}
+            />
+          </View>
 
           <View className="mt-10 items-center">
             <UsersRound color="#00b37e" size={34} />

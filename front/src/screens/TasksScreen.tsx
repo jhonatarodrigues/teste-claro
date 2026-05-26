@@ -1,9 +1,11 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { DrawerActions } from '@react-navigation/native';
 import { ChevronLeft } from 'lucide-react-native';
 import { useRef } from 'react';
 import { ActivityIndicator, Animated, FlatList, Pressable, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { DrawerMenuButton } from '../components/navigation/DrawerMenuButton';
 import { TaskCard } from '../components/tasks/TaskCard';
 import { TaskFilterBar } from '../components/tasks/TaskFilterBar';
 import { TeamHorizontalList } from '../components/teams/TeamHorizontalList';
@@ -24,7 +26,7 @@ export function TasksScreen({ navigation, route }: Props) {
   const teamName = route.params?.teamName;
   const { filters, search, setSearch, setStatus, status, teamId, setTeamId } = useTaskFilters(initialTeamId);
   const { data: tasksResponse, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isError } = useInfiniteTasks(filters);
-  const { data: teamsResponse, isError: isTeamsError } = useTeams({ limit: 1000 });
+  const { data: teamsResponse, isError: isTeamsError } = useTeams({ limit: 100 });
   const scrollY = useRef(new Animated.Value(0)).current;
 
   const teams = teamsResponse?.data ?? [];
@@ -58,9 +60,15 @@ export function TasksScreen({ navigation, route }: Props) {
         }}
       >
         <View className="pt-4">
-          <Pressable onPress={() => navigation.goBack()} className="h-12 w-12 items-start justify-center">
-            <ChevronLeft color="#ffffff" size={20} />
-          </Pressable>
+          <View className="flex-row items-center justify-between">
+            <DrawerMenuButton
+              testID="tasks-drawer-button"
+              onPress={() => navigation.getParent()?.dispatch(DrawerActions.openDrawer())}
+            />
+            <Pressable onPress={() => navigation.goBack()} className="h-12 w-12 items-center justify-center">
+              <ChevronLeft color="#ffffff" size={20} />
+            </Pressable>
+          </View>
 
           <View className="mt-6">
             <SectionTitle

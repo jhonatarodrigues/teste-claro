@@ -1,8 +1,10 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { DrawerActions } from '@react-navigation/native';
 import { CheckCheck, ChevronLeft, Trash2 } from 'lucide-react-native';
 import { useMemo } from 'react';
 import { ActivityIndicator, Alert, Pressable, Text, View } from 'react-native';
 
+import { DrawerMenuButton } from '../components/navigation/DrawerMenuButton';
 import { TaskForm, TaskFormData } from '../components/tasks/TaskForm';
 import { EmptyState } from '../components/ui/EmptyState';
 import { Screen } from '../components/ui/Screen';
@@ -18,7 +20,7 @@ export function TaskFormScreen({ navigation, route }: Props) {
   const taskId = route.params?.taskId;
   const presetTeamId = route.params?.teamId;
   const editing = Boolean(taskId);
-  const { data: teamsResponse } = useTeams({ limit: 1000 });
+  const { data: teamsResponse } = useTeams({ limit: 100 });
   const { data: taskResponse, isLoading } = useTask(taskId);
   const { createTask, updateTask, deleteTask } = useTaskMutations();
 
@@ -98,22 +100,28 @@ export function TaskFormScreen({ navigation, route }: Props) {
             <Pressable onPress={() => navigation.goBack()} className="h-12 w-12 items-start justify-center">
               <ChevronLeft color="#ffffff" size={20} />
             </Pressable>
-            {editing && taskId ? (
-              <Pressable
-                onPress={deleteTask.isPending ? undefined : handleDelete}
-                disabled={deleteTask.isPending}
-                testID="task-delete-action"
-                className="h-12 w-12 items-end justify-center"
-              >
-                {deleteTask.isPending ? (
-                  <ActivityIndicator testID="task-delete-loading" color="#ffffff" size="small" />
-                ) : (
-                  <Trash2 color="#ffffff" size={18} />
-                )}
-              </Pressable>
-            ) : (
-              <View className="h-12 w-12" />
-            )}
+            <View className="flex-row items-center gap-3">
+              <DrawerMenuButton
+                testID="task-form-drawer-button"
+                onPress={() => navigation.getParent()?.dispatch(DrawerActions.openDrawer())}
+              />
+              {editing && taskId ? (
+                <Pressable
+                  onPress={deleteTask.isPending ? undefined : handleDelete}
+                  disabled={deleteTask.isPending}
+                  testID="task-delete-action"
+                  className="h-12 w-12 items-end justify-center"
+                >
+                  {deleteTask.isPending ? (
+                    <ActivityIndicator testID="task-delete-loading" color="#ffffff" size="small" />
+                  ) : (
+                    <Trash2 color="#ffffff" size={18} />
+                  )}
+                </Pressable>
+              ) : (
+                <View className="h-12 w-12" />
+              )}
+            </View>
           </View>
 
           <View className="mt-10 items-center">
