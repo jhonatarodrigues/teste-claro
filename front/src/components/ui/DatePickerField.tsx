@@ -1,7 +1,7 @@
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { CalendarDays, X } from 'lucide-react-native';
 import { useMemo, useState } from 'react';
-import { Modal, Pressable, Text, View } from 'react-native';
+import { Platform, Pressable, Text, View } from 'react-native';
 
 import { dateToDateOnlyInput, formatDueDateLabel, parseDueDateInput } from '../../utils/due-date';
 
@@ -21,12 +21,11 @@ export function DatePickerField({
   error,
 }: DatePickerFieldProps) {
   const [visible, setVisible] = useState(false);
-  const [draftDate, setDraftDate] = useState<Date>(() => parseDueDateInput(value) ?? new Date());
 
   const displayValue = useMemo(() => formatDueDateLabel(value), [value]);
+  const pickerDate = useMemo(() => parseDueDateInput(value) ?? new Date(), [value]);
 
   const openPicker = () => {
-    setDraftDate(parseDueDateInput(value) ?? new Date());
     setVisible(true);
   };
 
@@ -34,14 +33,11 @@ export function DatePickerField({
     setVisible(false);
   };
 
-  const confirmSelection = () => {
-    onChange(dateToDateOnlyInput(draftDate));
-    closePicker();
-  };
-
   const clearSelection = () => {
     onChange('');
-    closePicker();
+    if (Platform.OS !== 'ios') {
+      closePicker();
+    }
   };
 
   return (
@@ -59,49 +55,52 @@ export function DatePickerField({
 
       {error ? <Text className="text-xs text-app-danger">{error}</Text> : null}
 
-      <Modal transparent visible={visible} animationType="fade" onRequestClose={closePicker}>
-        <Pressable className="flex-1 items-center justify-center bg-black/50 px-6" onPress={closePicker}>
-          <Pressable className="w-full rounded-2xl bg-app-surface p-4" onPress={() => undefined}>
-            <View className="mb-4 flex-row items-center justify-between">
-              <Text className="text-lg font-semibold text-white">Data de vencimento</Text>
-              {value ? (
-                <Pressable onPress={clearSelection} testID="due-date-clear-action" className="h-10 w-10 items-center justify-center">
-                  <X color="#ffffff" size={18} />
-                </Pressable>
-              ) : (
-                <View className="h-10 w-10" />
-              )}
-            </View>
-
-            <DateTimePicker
-              value={draftDate}
-              mode="date"
-              display="default"
-              onChange={(_event, selectedDate) => {
-                if (selectedDate) {
-                  setDraftDate(selectedDate);
-                }
-              }}
-              testID="due-date-picker-native"
-            />
-
-            <View className="mt-4 flex-row gap-3">
-              <Pressable
-                onPress={closePicker}
-                className="h-11 flex-1 items-center justify-center rounded-xl border border-app-border bg-app-bg"
-              >
-                <Text className="font-semibold text-white">Cancelar</Text>
+      {visible ? (
+        <View testID="due-date-picker-container" className="rounded-2xl bg-app-surface px-3 py-2">
+          <View className="mb-2 flex-row items-center justify-between px-1 pt-1">
+            <Text className="text-base font-semibold text-white">Data de vencimento</Text>
+            {value ? (
+              <Pressable onPress={clearSelection} testID="due-date-clear-action" className="h-10 w-10 items-center justify-center">
+                <X color="#ffffff" size={18} />
               </Pressable>
-              <Pressable
-                onPress={confirmSelection}
-                className="h-11 flex-1 items-center justify-center rounded-xl bg-app-accent"
-              >
-                <Text className="font-semibold text-white">Confirmar</Text>
+            ) : (
+              <Pressable onPress={closePicker} className="h-10 items-center justify-center px-2">
+                <Text className="text-sm font-semibold text-app-muted">Fechar</Text>
+              </Pressable>
+            )}
+          </View>
+
+          <DateTimePicker
+            value={pickerDate}
+            mode="date"
+            display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+            onChange={(event, selectedDate) => {
+              if (Platform.OS === 'android') {
+                setVisible(false);
+              }
+
+              if (!selectedDate) {
+                return;
+              }
+
+              onChange(dateToDateOnlyInput(selectedDate));
+
+              if (Platform.OS !== 'ios') {
+                closePicker();
+              }
+            }}
+            testID="due-date-picker-native"
+          />
+
+          {Platform.OS === 'ios' ? (
+            <View className="mt-2 flex-row justify-end px-1 pb-1">
+              <Pressable onPress={closePicker} className="h-10 items-center justify-center px-2">
+                <Text className="text-sm font-semibold text-app-accent">Concluir</Text>
               </Pressable>
             </View>
-          </Pressable>
-        </Pressable>
-      </Modal>
+          ) : null}
+        </View>
+      ) : null}
     </View>
   );
 }

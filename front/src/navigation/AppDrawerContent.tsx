@@ -2,6 +2,7 @@ import { ReactNode } from 'react';
 import { DrawerContentComponentProps, DrawerContentScrollView } from '@react-navigation/drawer';
 import { CheckSquare, FolderKanban, Plus, UsersRound } from 'lucide-react-native';
 import { Pressable, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 function DrawerItem({
   label,
@@ -27,13 +28,18 @@ function DrawerItem({
 }
 
 export function AppDrawerContent({ navigation }: DrawerContentComponentProps) {
+  const insets = useSafeAreaInsets();
+
   const navigateToStack = (screen: 'Teams' | 'Tasks' | 'TeamForm' | 'TaskForm') => {
     navigation.navigate('MainStack', { screen });
     navigation.closeDrawer();
   };
 
   return (
-    <DrawerContentScrollView className="flex-1 bg-app-bg" contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 20 }}>
+    <DrawerContentScrollView
+      className="flex-1 bg-app-bg"
+      contentContainerStyle={{ paddingHorizontal: 20, paddingTop: insets.top + 32 }}
+    >
       <View className="mb-8">
         <Text className="text-3xl font-bold text-white">Menu</Text>
         <Text className="mt-2 text-sm text-app-muted">Acesse as principais areas do app</Text>
