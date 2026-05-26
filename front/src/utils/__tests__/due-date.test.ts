@@ -1,8 +1,10 @@
 import {
+  dateToDateOnlyInput,
   formatDueDateInput,
   formatDueDateLabel,
   isAcceptedDueDateInput,
   normalizeDueDateInput,
+  parseDueDateInput,
 } from '../due-date';
 
 describe('due-date utils', () => {
@@ -23,5 +25,12 @@ describe('due-date utils', () => {
 
   it('formats labels for pt-BR display', () => {
     expect(formatDueDateLabel('2026-05-26T00:00:00.000Z')).toBe('26/05/2026');
+  });
+
+  it('parses and serializes date-only values consistently', () => {
+    const parsed = parseDueDateInput('2026-05-26');
+
+    expect(parsed).toBeInstanceOf(Date);
+    expect(dateToDateOnlyInput(parsed as Date)).toBe('2026-05-26');
   });
 });

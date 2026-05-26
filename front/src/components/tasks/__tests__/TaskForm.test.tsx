@@ -94,10 +94,10 @@ describe('TaskForm', () => {
   });
 
   it('renders the due date field', () => {
-    const { getByPlaceholderText } = render(
+    const { getByText } = render(
       <TaskForm teams={[]} submitLabel="Create" onSubmit={jest.fn()} />,
     );
 
-    expect(getByPlaceholderText('Data de vencimento (AAAA-MM-DD)')).toBeTruthy();
+    expect(getByText('Selecionar data de vencimento')).toBeTruthy();
   });
 });

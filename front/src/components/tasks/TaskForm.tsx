@@ -8,6 +8,7 @@ import { Team } from '../../types/team';
 import { TaskStatus } from '../../types/task';
 import { isAcceptedDueDateInput } from '../../utils/due-date';
 import { Button } from '../ui/Button';
+import { DatePickerField } from '../ui/DatePickerField';
 import { Input } from '../ui/Input';
 import { Select } from '../ui/Select';
 
@@ -98,12 +99,7 @@ export function TaskForm({
         control={control}
         name="dueDate"
         render={({ field: { onChange, value } }) => (
-          <Input
-            placeholder="Data de vencimento (AAAA-MM-DD)"
-            value={value}
-            onChangeText={onChange}
-            error={errors.dueDate?.message}
-          />
+          <DatePickerField value={value} onChange={onChange} error={errors.dueDate?.message} />
         )}
       />
 
