@@ -11,7 +11,11 @@ export function prismaStatusToApi(status: TaskStatus) {
     return 'Em Progresso';
   }
 
-  return status;
+  if (status === TaskStatus.Concluida) {
+    return 'Concluída';
+  }
+
+  return 'Pendente';
 }
 
 export function toTaskResponse(task: TaskWithLinks) {

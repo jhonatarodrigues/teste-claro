@@ -1,7 +1,7 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { DrawerActions } from '@react-navigation/native';
 import { Search } from 'lucide-react-native';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { ActivityIndicator, Alert, FlatList, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -12,7 +12,6 @@ import { EmptyState } from '../components/ui/EmptyState';
 import { SectionTitle } from '../components/ui/SectionTitle';
 import { useInfiniteTeams } from '../hooks/useInfiniteTeams';
 import { useTeamMutations } from '../hooks/useTeamMutations';
-import { useTasks } from '../hooks/useTasks';
 import { RootStackParamList } from '../navigation/types';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Teams'>;
@@ -31,17 +30,6 @@ export function TeamsScreen({ navigation }: Props) {
     search,
     limit: 10,
   });
-  const { data: tasksResponse } = useTasks({ limit: 50, offset: 0 });
-
-  const tasksByTeam = useMemo(() => {
-    const counts = new Map<string, number>();
-    (tasksResponse?.data ?? []).forEach((task) => {
-      task.teamIds.forEach((teamId) => {
-        counts.set(teamId, (counts.get(teamId) ?? 0) + 1);
-      });
-    });
-    return counts;
-  }, [tasksResponse?.data]);
 
   const teams = teamsResponse?.pages.flatMap((page) => page.data) ?? [];
   const totalTeams = teamsResponse?.pages.at(-1)?.meta.total ?? 0;
@@ -67,7 +55,7 @@ export function TeamsScreen({ navigation }: Props) {
           <View className="mb-3">
             <TeamCard
               team={item}
-              tasksCount={tasksByTeam.get(item.id) ?? 0}
+              tasksCount={item.taskCount ?? 0}
               onPress={() => navigation.navigate('Tasks', { teamId: item.id, teamName: item.name })}
               onEdit={() => navigation.navigate('TeamForm', { teamId: item.id })}
               onDelete={() =>

@@ -15,7 +15,7 @@ import { Select } from '../ui/Select';
 export const taskFormSchema = z.object({
   title: z.string().trim().min(3, 'Informe pelo menos 3 caracteres'),
   description: z.string().trim().optional(),
-  status: z.enum(['Pendente', 'Em Progresso', 'Concluida']),
+  status: z.enum(['Pendente', 'Em Progresso', 'Concluída']),
   dueDate: z
     .string()
     .optional()
@@ -129,7 +129,7 @@ export function TaskForm({
             options={[
               { label: 'Pendente', value: 'Pendente' },
               { label: 'Em Progresso', value: 'Em Progresso' },
-              { label: 'Concluida', value: 'Concluida' },
+              { label: 'Concluída', value: 'Concluída' },
             ]}
             error={errors.status?.message}
           />

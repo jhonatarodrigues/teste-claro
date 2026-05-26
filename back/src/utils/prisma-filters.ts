@@ -1,8 +1,10 @@
 import { Prisma, TaskStatus } from '@prisma/client';
 
+import { TaskApiStatus } from '../modules/tasks/schema/tasks.schema';
+
 type TaskListParams = {
   teamId?: string;
-  status?: 'Pendente' | 'Em Progresso' | 'Concluida';
+  status?: TaskApiStatus;
   search?: string;
   sort?: 'title' | 'dueDate' | 'status';
 };
@@ -10,7 +12,8 @@ type TaskListParams = {
 export function apiStatusToPrisma(status: TaskListParams['status']): TaskStatus | undefined {
   if (!status) return undefined;
   if (status === 'Em Progresso') return TaskStatus.Em_Progresso;
-  return status as TaskStatus;
+  if (status === 'Concluída') return TaskStatus.Concluida;
+  return TaskStatus.Pendente;
 }
 
 export function buildTaskWhere(params: TaskListParams): Prisma.TaskWhereInput {

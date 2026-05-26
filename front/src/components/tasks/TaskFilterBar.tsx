@@ -48,7 +48,7 @@ export function TaskFilterBar({
               { label: 'Todos os status', value: '__all__' },
               { label: 'Pendente', value: 'Pendente' },
               { label: 'Em Progresso', value: 'Em Progresso' },
-              { label: 'Concluida', value: 'Concluida' },
+              { label: 'Concluída', value: 'Concluída' },
             ]}
             onChange={(value) => onStatusChange(value === '__all__' ? undefined : (value as TaskStatus))}
           />

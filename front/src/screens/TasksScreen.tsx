@@ -12,9 +12,9 @@ import { TeamHorizontalList } from '../components/teams/TeamHorizontalList';
 import { Button } from '../components/ui/Button';
 import { EmptyState } from '../components/ui/EmptyState';
 import { SectionTitle } from '../components/ui/SectionTitle';
+import { useAllTeams } from '../hooks/useAllTeams';
 import { useInfiniteTasks } from '../hooks/useInfiniteTasks';
 import { useTaskFilters } from '../hooks/useTaskFilters';
-import { useTeams } from '../hooks/useTeams';
 import { RootStackParamList } from '../navigation/types';
 import { Task } from '../types/task';
 
@@ -26,10 +26,9 @@ export function TasksScreen({ navigation, route }: Props) {
   const teamName = route.params?.teamName;
   const { filters, search, setSearch, setStatus, status, teamId, setTeamId } = useTaskFilters(initialTeamId);
   const { data: tasksResponse, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isError } = useInfiniteTasks(filters);
-  const { data: teamsResponse, isError: isTeamsError } = useTeams({ limit: 100 });
+  const { data: teams = [], isError: isTeamsError } = useAllTeams();
   const scrollY = useRef(new Animated.Value(0)).current;
 
-  const teams = teamsResponse?.data ?? [];
   const tasks = tasksResponse?.pages.flatMap((page) => page.data) ?? [];
   const totalTasks = tasksResponse?.pages.at(-1)?.meta.total ?? 0;
   const headerHeight = scrollY.interpolate({

@@ -5,7 +5,7 @@ import { TaskStatus } from '../../types/task';
 const styles: Record<TaskStatus, string> = {
   Pendente: 'bg-[#d9480f]',
   'Em Progresso': 'bg-[#c2a313]',
-  Concluida: 'bg-[#7cb518]',
+  'Concluída': 'bg-[#7cb518]',
 };
 
 export function StatusBadge({ status }: { status: TaskStatus }) {

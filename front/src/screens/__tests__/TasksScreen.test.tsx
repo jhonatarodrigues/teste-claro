@@ -44,18 +44,15 @@ jest.mock('../../hooks/useInfiniteTasks', () => ({
   useInfiniteTasks: () => mockInfiniteTasksState,
 }));
 
-jest.mock('../../hooks/useTeams', () => ({
-  useTeams: () => ({
-    data: {
-      data: [
-        {
-          id: 'team-1',
-          name: 'Team A',
-          colorHex: '#8BFF3D',
-        },
-      ],
-      meta: { total: 1, limit: 20, offset: 0 },
-    },
+jest.mock('../../hooks/useAllTeams', () => ({
+  useAllTeams: () => ({
+    data: [
+      {
+        id: 'team-1',
+        name: 'Team A',
+        colorHex: '#8BFF3D',
+      },
+    ],
   }),
 }));
 

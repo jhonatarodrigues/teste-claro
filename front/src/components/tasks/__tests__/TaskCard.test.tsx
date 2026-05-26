@@ -10,7 +10,7 @@ describe('TaskCard', () => {
           id: 'task-1',
           title: 'Task title',
           description: 'Task description',
-          status: 'Concluida',
+          status: 'Concluída',
           dueDate: '2026-05-26T00:00:00.000Z',
           teamIds: ['team-1'],
         }}
@@ -28,7 +28,7 @@ describe('TaskCard', () => {
     expect(getByText('Task title')).toBeTruthy();
     expect(getByText('Task description')).toBeTruthy();
     expect(getByText('Vencimento: 26/05/2026')).toBeTruthy();
-    expect(getByText('concluida')).toBeTruthy();
+    expect(getByText('concluída')).toBeTruthy();
     expect(getAllByText('Team A').length).toBeGreaterThan(0);
   });
 });

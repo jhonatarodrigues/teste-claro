@@ -37,7 +37,7 @@ services:
     volumes:
       - .:/app
       - claro_back_node_modules:/app/node_modules
-    command: sh -c "pnpm prisma:generate && pnpm prisma:migrate:deploy && pnpm prisma:seed && pnpm dev"
+    command: sh -c "pnpm prisma:generate && pnpm prisma:migrate:deploy && pnpm dev"
 
 volumes:
   claro_mysql_data:

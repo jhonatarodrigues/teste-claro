@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-const taskStatusSchema = z.enum(['Pendente', 'Em Progresso', 'Concluida']);
+const taskStatusSchema = z.enum(['Pendente', 'Em Progresso', 'Concluída']);
 const dbVarcharMax = 191;
 const taskIdSchema = z.string().trim().min(1).max(dbVarcharMax);
 const taskDescriptionSchema = z.string().trim().max(dbVarcharMax);

@@ -11,10 +11,6 @@ jest.mock('../../hooks/useInfiniteTeams', () => ({
   useInfiniteTeams: jest.fn(),
 }));
 
-jest.mock('../../hooks/useTasks', () => ({
-  useTasks: jest.fn(),
-}));
-
 jest.mock('../../hooks/useTeamMutations', () => ({
   useTeamMutations: () => ({
     removeTeam: {
@@ -26,10 +22,6 @@ jest.mock('../../hooks/useTeamMutations', () => ({
 
 const { useInfiniteTeams } = jest.requireMock('../../hooks/useInfiniteTeams') as {
   useInfiniteTeams: jest.Mock;
-};
-
-const { useTasks } = jest.requireMock('../../hooks/useTasks') as {
-  useTasks: jest.Mock;
 };
 
 describe('TeamsScreen', () => {
@@ -45,6 +37,7 @@ describe('TeamsScreen', () => {
                 id: 'team-1',
                 name: 'Team A',
                 colorHex: '#00B37E',
+                taskCount: 3,
               },
             ],
             meta: {
@@ -59,21 +52,6 @@ describe('TeamsScreen', () => {
       isFetchingNextPage: false,
       hasNextPage: true,
       fetchNextPage: mockFetchNextTeamsPage,
-    });
-
-    useTasks.mockReturnValue({
-      data: {
-        data: [
-          {
-            id: 'task-1',
-            title: 'Task title',
-            description: 'Task description',
-            status: 'Pendente',
-            teamIds: ['team-1'],
-          },
-        ],
-      },
-      isLoading: false,
     });
   });
 

@@ -3,4 +3,5 @@ export type Team = {
   name: string;
   colorHex: string;
   description?: string;
+  taskCount?: number;
 };

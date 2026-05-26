@@ -79,6 +79,13 @@ docker compose ps
 curl -sS http://127.0.0.1:3333/health
 ```
 
+### 4. Rode o seed inicial
+
+```bash
+cd back
+docker compose exec api pnpm seed
+```
+
 ## Portas locais
 
 - API: `3333`
@@ -232,7 +239,7 @@ pnpm prisma:migrate
 ```bash
 cd back
 nvm use
-pnpm prisma:seed
+pnpm seed
 ```
 
 ### 5. Suba a API
@@ -264,9 +271,10 @@ pnpm docker:logs
 Notas rápidas sobre execução:
 
 - `pnpm dev` é o comando para desenvolvimento local com recarregamento automático.
-- `pnpm start` executa `dist/server.js`, então ele deve ser usado depois de `pnpm build`.
+- `pnpm start` executa `dist/src/server.js`, então ele deve ser usado depois de `pnpm build`.
 - `pnpm docker:up` sobe a stack em modo destacado, alinhado com o fluxo recomendado deste README.
-- No fluxo com Docker, o container da API executa `prisma:generate`, `prisma:migrate:deploy` e `prisma:seed` antes de iniciar o servidor.
+- No fluxo com Docker, o container da API executa `prisma:generate` e `prisma:migrate:deploy` antes de iniciar o servidor.
+- O seed é manual, para preservar os dados do volume entre reinícios da stack.
 
 ## Testes
 

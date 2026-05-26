@@ -12,7 +12,7 @@ let mockTaskFormProps:
       onSubmit: (values: {
         title: string;
         description: string;
-        status: 'Pendente' | 'Em Progresso' | 'Concluida';
+        status: 'Pendente' | 'Em Progresso' | 'Concluída';
         dueDate: string;
         teamIds: string[];
       }) => void;
@@ -23,8 +23,8 @@ jest.mock('../../hooks/useTask', () => ({
   useTask: jest.fn(),
 }));
 
-jest.mock('../../hooks/useTeams', () => ({
-  useTeams: jest.fn(),
+jest.mock('../../hooks/useAllTeams', () => ({
+  useAllTeams: jest.fn(),
 }));
 
 jest.mock('../../hooks/useTaskMutations', () => ({
@@ -55,8 +55,8 @@ const { useTask } = jest.requireMock('../../hooks/useTask') as {
   useTask: jest.Mock;
 };
 
-const { useTeams } = jest.requireMock('../../hooks/useTeams') as {
-  useTeams: jest.Mock;
+const { useAllTeams } = jest.requireMock('../../hooks/useAllTeams') as {
+  useAllTeams: jest.Mock;
 };
 
 describe('TaskFormScreen', () => {
@@ -65,10 +65,8 @@ describe('TaskFormScreen', () => {
     mockTaskFormProps = undefined;
     mockDeleteTaskPending = false;
 
-    useTeams.mockReturnValue({
-      data: {
-        data: [{ id: 'team-1', name: 'Team A', colorHex: '#00B37E' }],
-      },
+    useAllTeams.mockReturnValue({
+      data: [{ id: 'team-1', name: 'Team A', colorHex: '#00B37E' }],
     });
 
     useTask.mockReturnValue({
@@ -103,7 +101,7 @@ describe('TaskFormScreen', () => {
     await mockTaskFormProps?.onSubmit({
       title: 'Updated title',
       description: 'Updated description',
-      status: 'Concluida',
+      status: 'Concluída',
       dueDate: '2026-05-26',
       teamIds: ['team-2'],
     });
@@ -114,7 +112,7 @@ describe('TaskFormScreen', () => {
         input: {
           title: 'Updated title',
           description: 'Updated description',
-          status: 'Concluida',
+          status: 'Concluída',
           dueDate: '2026-05-26T00:00:00.000Z',
           teamIds: ['team-2'],
         },

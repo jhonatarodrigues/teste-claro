@@ -10,8 +10,8 @@ jest.mock('../../hooks/useTask', () => ({
   useTask: jest.fn(),
 }));
 
-jest.mock('../../hooks/useTeams', () => ({
-  useTeams: jest.fn(),
+jest.mock('../../hooks/useAllTeams', () => ({
+  useAllTeams: jest.fn(),
 }));
 
 jest.mock('../../hooks/useTaskMutations', () => ({
@@ -31,8 +31,8 @@ const { useTask } = jest.requireMock('../../hooks/useTask') as {
   useTask: jest.Mock;
 };
 
-const { useTeams } = jest.requireMock('../../hooks/useTeams') as {
-  useTeams: jest.Mock;
+const { useAllTeams } = jest.requireMock('../../hooks/useAllTeams') as {
+  useAllTeams: jest.Mock;
 };
 
 describe('TaskDetailsScreen', () => {
@@ -53,10 +53,8 @@ describe('TaskDetailsScreen', () => {
       isLoading: false,
     });
 
-    useTeams.mockReturnValue({
-      data: {
-        data: [{ id: 'team-1', name: 'Team A', colorHex: '#00B37E' }],
-      },
+    useAllTeams.mockReturnValue({
+      data: [{ id: 'team-1', name: 'Team A', colorHex: '#00B37E' }],
     });
   });
 
@@ -91,12 +89,12 @@ describe('TaskDetailsScreen', () => {
       />,
     );
 
-    fireEvent.press(getByText('Marcar como concluida'));
+    fireEvent.press(getByText('Marcar como concluída'));
 
     await waitFor(() => {
       expect(mockUpdateStatusMutateAsync).toHaveBeenCalledWith({
         id: 'task-1',
-        status: 'Concluida',
+        status: 'Concluída',
       });
     });
   });

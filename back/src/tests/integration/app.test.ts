@@ -67,6 +67,9 @@ describe('app bootstrap', () => {
         name: 'Team A',
         colorHex: '#8BFF3D',
         description: null,
+        _count: {
+          taskLinks: 1,
+        },
         createdAt: new Date(),
         updatedAt: new Date(),
       },
@@ -83,6 +86,7 @@ describe('app bootstrap', () => {
           name: 'Team A',
           colorHex: '#8BFF3D',
           description: null,
+          taskCount: 1,
         },
       ],
       meta: {

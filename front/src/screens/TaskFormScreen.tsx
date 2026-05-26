@@ -8,9 +8,9 @@ import { DrawerMenuButton } from '../components/navigation/DrawerMenuButton';
 import { TaskForm, TaskFormData } from '../components/tasks/TaskForm';
 import { EmptyState } from '../components/ui/EmptyState';
 import { Screen } from '../components/ui/Screen';
+import { useAllTeams } from '../hooks/useAllTeams';
 import { useTask } from '../hooks/useTask';
 import { useTaskMutations } from '../hooks/useTaskMutations';
-import { useTeams } from '../hooks/useTeams';
 import { RootStackParamList } from '../navigation/types';
 import { formatDueDateInput, normalizeDueDateInput } from '../utils/due-date';
 
@@ -20,11 +20,10 @@ export function TaskFormScreen({ navigation, route }: Props) {
   const taskId = route.params?.taskId;
   const presetTeamId = route.params?.teamId;
   const editing = Boolean(taskId);
-  const { data: teamsResponse } = useTeams({ limit: 100 });
+  const { data: teams = [] } = useAllTeams();
   const { data: taskResponse, isLoading } = useTask(taskId);
   const { createTask, updateTask, deleteTask } = useTaskMutations();
 
-  const teams = teamsResponse?.data ?? [];
   const currentTask = taskResponse?.data;
 
   const defaultValues = useMemo(

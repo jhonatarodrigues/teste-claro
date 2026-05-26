@@ -62,7 +62,7 @@ describe('httpTaskRepository', () => {
           id: 'task-1',
           title: 'Nova tarefa',
           description: null,
-          status: 'Concluida',
+          status: 'Concluída',
           dueDate: null,
           teamIds: [],
         },
@@ -75,7 +75,7 @@ describe('httpTaskRepository', () => {
       }),
     );
 
-    await repository.updateStatus('task-1', 'Concluida');
+    await repository.updateStatus('task-1', 'Concluída');
 
     expect(fetchMock).toHaveBeenCalledWith('http://example.com/api/tasks/task-1', {
       method: 'PUT',
@@ -84,7 +84,7 @@ describe('httpTaskRepository', () => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        status: 'Concluida',
+        status: 'Concluída',
       }),
     });
   });

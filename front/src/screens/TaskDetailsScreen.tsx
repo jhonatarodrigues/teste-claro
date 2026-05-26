@@ -7,11 +7,11 @@ import { DrawerMenuButton } from '../components/navigation/DrawerMenuButton';
 import { Button } from '../components/ui/Button';
 import { EmptyState } from '../components/ui/EmptyState';
 import { Screen } from '../components/ui/Screen';
+import { useAllTeams } from '../hooks/useAllTeams';
 import { StatusBadge } from '../components/ui/StatusBadge';
 import { TeamChip } from '../components/ui/TeamChip';
 import { useTask } from '../hooks/useTask';
 import { useTaskMutations } from '../hooks/useTaskMutations';
-import { useTeams } from '../hooks/useTeams';
 import { RootStackParamList } from '../navigation/types';
 import { formatDueDateLabel } from '../utils/due-date';
 
@@ -20,10 +20,9 @@ type Props = NativeStackScreenProps<RootStackParamList, 'TaskDetails'>;
 export function TaskDetailsScreen({ navigation, route }: Props) {
   const taskId = route.params.taskId;
   const { data: taskResponse, isLoading } = useTask(taskId);
-  const { data: teamsResponse } = useTeams({ limit: 100 });
+  const { data: teams = [] } = useAllTeams();
   const { deleteTask, updateStatus } = useTaskMutations();
 
-  const teams = teamsResponse?.data ?? [];
   const task = taskResponse?.data;
   const dueDateLabel = formatDueDateLabel(task?.dueDate);
 
@@ -49,7 +48,7 @@ export function TaskDetailsScreen({ navigation, route }: Props) {
     try {
       await updateStatus.mutateAsync({
         id: taskId,
-        status: 'Concluida',
+        status: 'Concluída',
       });
     } catch {
       Alert.alert('Não foi possível atualizar o status', 'Tente novamente em instantes.');
@@ -126,11 +125,11 @@ export function TaskDetailsScreen({ navigation, route }: Props) {
             <View className="mt-5 gap-3">
               <Button title="Editar tarefa" onPress={() => navigation.navigate('TaskForm', { taskId })} />
               <Button
-                title={task.status === 'Concluida' ? 'Tarefa concluida' : 'Marcar como concluida'}
+                title={task.status === 'Concluída' ? 'Tarefa concluída' : 'Marcar como concluída'}
                 variant="ghost"
                 onPress={handleCompleteTask}
                 loading={updateStatus.isPending}
-                disabled={task.status === 'Concluida'}
+                disabled={task.status === 'Concluída'}
               />
             </View>
           </>

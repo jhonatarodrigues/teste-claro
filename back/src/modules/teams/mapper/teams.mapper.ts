@@ -1,10 +1,17 @@
 import { Team } from '@prisma/client';
 
-export function toTeamResponse(team: Team) {
+type TeamWithTaskCount = Team & {
+  _count?: {
+    taskLinks?: number;
+  };
+};
+
+export function toTeamResponse(team: TeamWithTaskCount) {
   return {
     id: team.id,
     name: team.name,
     colorHex: team.colorHex,
     description: team.description,
+    taskCount: team._count?.taskLinks,
   };
 }

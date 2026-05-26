@@ -18,6 +18,13 @@ export async function listTeams(query: ListTeamsQuery) {
   const [teams, total] = await prisma.$transaction([
     prisma.team.findMany({
       where,
+      include: {
+        _count: {
+          select: {
+            taskLinks: true,
+          },
+        },
+      },
       take: limit,
       skip: offset,
       orderBy: {
@@ -38,7 +45,16 @@ export async function listTeams(query: ListTeamsQuery) {
 }
 
 export async function getTeamById(id: string) {
-  const team = await prisma.team.findUnique({ where: { id } });
+  const team = await prisma.team.findUnique({
+    where: { id },
+    include: {
+      _count: {
+        select: {
+          taskLinks: true,
+        },
+      },
+    },
+  });
 
   if (!team) {
     throw new AppError(404, 'TEAM_NOT_FOUND', 'Team not found');
@@ -53,6 +69,13 @@ export async function createTeam(input: CreateTeamBody) {
       name: input.name,
       colorHex: input.colorHex,
       description: input.description,
+    },
+    include: {
+      _count: {
+        select: {
+          taskLinks: true,
+        },
+      },
     },
   });
 
@@ -72,6 +95,13 @@ export async function updateTeam(id: string, input: UpdateTeamBody) {
       name: input.name,
       colorHex: input.colorHex,
       description: input.description,
+    },
+    include: {
+      _count: {
+        select: {
+          taskLinks: true,
+        },
+      },
     },
   });
 
