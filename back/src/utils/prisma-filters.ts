@@ -51,14 +51,14 @@ export function buildTaskWhere(params: TaskListParams): Prisma.TaskWhereInput {
   return where;
 }
 
-export function buildTaskOrderBy(sort?: TaskListParams['sort']): Prisma.TaskOrderByWithRelationInput {
+export function buildTaskOrderBy(sort?: TaskListParams['sort']): Prisma.TaskOrderByWithRelationInput[] {
   if (sort === 'title') {
-    return { title: 'asc' };
+    return [{ title: 'asc' }, { createdAt: 'desc' }, { id: 'desc' }];
   }
 
   if (sort === 'dueDate') {
-    return { dueDate: 'asc' };
+    return [{ dueDate: 'asc' }, { createdAt: 'desc' }, { id: 'desc' }];
   }
 
-  return { status: 'asc' };
+  return [{ status: 'asc' }, { createdAt: 'desc' }, { id: 'desc' }];
 }
