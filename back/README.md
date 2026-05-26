@@ -25,9 +25,11 @@ API REST em Node.js + Express + TypeScript para gerenciar times e tarefas.
 
 ```bash
 cd back
-nvm use 22
+nvm use
 pnpm install
 ```
+
+O backend agora também possui `.nvmrc`, então `nvm use` já resolve a versão esperada (`22`).
 
 ## Variáveis de ambiente
 
@@ -57,6 +59,13 @@ cd back
 docker compose up -d --build
 ```
 
+Ou, usando o script do projeto:
+
+```bash
+cd back
+pnpm docker:up
+```
+
 ### 2. Verifique os containers
 
 ```bash
@@ -78,6 +87,119 @@ curl -sS http://127.0.0.1:3333/health
 
 O MySQL usa `3307` no host porque `3306` pode já estar ocupada na máquina local.
 
+## Formato da API
+
+Base URL:
+
+```text
+http://127.0.0.1:3333/api
+```
+
+Convenções de resposta:
+
+- Endpoints de coleção retornam `{ "data": [...], "meta": { "total", "limit", "offset" } }`
+- Endpoints de item único retornam `{ "data": { ... } }`
+- Erros retornam `{ "error": { "code", "message", "details?" } }`
+
+## Exemplos de CRUD
+
+Defina a base URL local primeiro:
+
+```bash
+BASE_URL=http://127.0.0.1:3333/api
+```
+
+### Times
+
+Criar um time:
+
+```bash
+curl -X POST "$BASE_URL/teams" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Platform",
+    "colorHex": "#2563EB",
+    "description": "Owns the shared app experience"
+  }'
+```
+
+Listar times:
+
+```bash
+curl "$BASE_URL/teams?limit=20&offset=0&search=plat"
+```
+
+Buscar um time:
+
+```bash
+curl "$BASE_URL/teams/TEAM_ID"
+```
+
+Atualizar um time:
+
+```bash
+curl -X PUT "$BASE_URL/teams/TEAM_ID" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Platform Core",
+    "description": "Owns shared flows and foundations"
+  }'
+```
+
+Excluir um time:
+
+```bash
+curl -X DELETE "$BASE_URL/teams/TEAM_ID"
+```
+
+### Tarefas
+
+Criar uma tarefa:
+
+```bash
+curl -X POST "$BASE_URL/tasks" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Prepare sprint board",
+    "description": "Group tasks by delivery team",
+    "status": "Pendente",
+    "dueDate": "2026-05-31T18:00:00.000Z",
+    "teamIds": ["TEAM_ID"]
+  }'
+```
+
+Listar tarefas com filtros:
+
+```bash
+curl "$BASE_URL/tasks?teamId=TEAM_ID&status=Pendente&sort=dueDate&limit=20&offset=0"
+```
+
+Se precisar usar o status `Em Progresso` na query string, encode o espaço: `Em%20Progresso`.
+
+Buscar uma tarefa:
+
+```bash
+curl "$BASE_URL/tasks/TASK_ID"
+```
+
+Atualizar uma tarefa:
+
+```bash
+curl -X PUT "$BASE_URL/tasks/TASK_ID" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Prepare sprint board",
+    "status": "Em Progresso",
+    "teamIds": ["TEAM_ID"]
+  }'
+```
+
+Excluir uma tarefa:
+
+```bash
+curl -X DELETE "$BASE_URL/tasks/TASK_ID"
+```
+
 ## Como rodar sem Docker
 
 Se você quiser rodar a API localmente e usar apenas o banco do Docker:
@@ -93,7 +215,7 @@ docker compose up -d db
 
 ```bash
 cd back
-nvm use 22
+nvm use
 pnpm prisma:generate
 ```
 
@@ -101,7 +223,7 @@ pnpm prisma:generate
 
 ```bash
 cd back
-nvm use 22
+nvm use
 pnpm prisma:migrate
 ```
 
@@ -109,7 +231,7 @@ pnpm prisma:migrate
 
 ```bash
 cd back
-nvm use 22
+nvm use
 pnpm prisma:seed
 ```
 
@@ -117,7 +239,7 @@ pnpm prisma:seed
 
 ```bash
 cd back
-nvm use 22
+nvm use
 pnpm dev
 ```
 
@@ -133,16 +255,24 @@ pnpm prisma:generate
 pnpm prisma:migrate
 pnpm prisma:migrate:deploy
 pnpm prisma:seed
+pnpm seed
 pnpm docker:up
 pnpm docker:down
 pnpm docker:logs
 ```
 
+Notas rápidas sobre execução:
+
+- `pnpm dev` é o comando para desenvolvimento local com recarregamento automático.
+- `pnpm start` executa `dist/server.js`, então ele deve ser usado depois de `pnpm build`.
+- `pnpm docker:up` sobe a stack em modo destacado, alinhado com o fluxo recomendado deste README.
+- No fluxo com Docker, o container da API executa `prisma:generate`, `prisma:migrate:deploy` e `prisma:seed` antes de iniciar o servidor.
+
 ## Testes
 
 ```bash
 cd back
-nvm use 22
+nvm use
 pnpm test
 pnpm typecheck
 ```
@@ -162,4 +292,4 @@ O seed atual cria:
 - `3` times
 - `10` tarefas
 
-Isso facilita validar rapidamente os fluxos do app.
+Ele também limpa os dados existentes antes de recriar a base inicial, o que facilita validar rapidamente os fluxos do app, mas vale evitar esse comando se você quiser preservar dados locais.

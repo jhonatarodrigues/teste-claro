@@ -5,7 +5,7 @@ import { z } from 'zod';
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   PORT: z.coerce.number().int().positive().default(3333),
-  DATABASE_URL: z.string().min(1).default('mysql://claro:claro@localhost:3306/claro'),
+  DATABASE_URL: z.string().min(1).default('mysql://claro:claro@127.0.0.1:3307/claro'),
   LOG_LEVEL: z.string().default('info'),
 });
 

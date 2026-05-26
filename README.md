@@ -5,7 +5,7 @@ Este repositório está dividido em duas aplicações:
 - [`front/`](./front) - cliente mobile em Expo/React Native. Veja [`front/README.md`](./front/README.md).
 - [`back/`](./back) - API REST em Node.js/Express com Prisma + MySQL. Veja [`back/README.md`](./back/README.md).
 
-Use os READMEs específicos de cada aplicação para detalhes de instalação e execução. Este README da raiz é a visão geral de entrega: estrutura, arquitetura, modelo de dados e exemplos da API.
+Use os READMEs específicos de cada aplicação para detalhes de instalação e execução. Este README da raiz é a visão geral de entrega: estrutura, arquitetura e modelo de dados.
 
 ## Estrutura do Repositório
 
@@ -13,7 +13,6 @@ Use os READMEs específicos de cada aplicação para detalhes de instalação e 
 .
 ├── back/   # API REST, schema do Prisma, Docker Compose e testes
 ├── front/  # App Expo, telas, hooks, repositories e testes
-└── docs/   # Documentação de apoio do projeto
 ```
 
 ## Resumo da Arquitetura
@@ -107,120 +106,7 @@ erDiagram
     TASK ||--o{ TASK_TEAM : assigns
 ```
 
-## Formato da API
-
-Base URL:
-
-```text
-http://127.0.0.1:3333/api
-```
-
-Convenções de resposta:
-
-- Endpoints de coleção retornam `{ "data": [...], "meta": { "total", "limit", "offset" } }`
-- Endpoints de item único retornam `{ "data": { ... } }`
-- Erros retornam `{ "error": { "code", "message", "details?" } }`
-
-## Exemplos de CRUD
-
-Defina a base URL local primeiro:
-
-```bash
-BASE_URL=http://127.0.0.1:3333/api
-```
-
-### Times
-
-Criar um time:
-
-```bash
-curl -X POST "$BASE_URL/teams" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "Platform",
-    "colorHex": "#2563EB",
-    "description": "Owns the shared app experience"
-  }'
-```
-
-Listar times:
-
-```bash
-curl "$BASE_URL/teams?limit=20&offset=0&search=plat"
-```
-
-Buscar um time:
-
-```bash
-curl "$BASE_URL/teams/TEAM_ID"
-```
-
-Atualizar um time:
-
-```bash
-curl -X PUT "$BASE_URL/teams/TEAM_ID" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "Platform Core",
-    "description": "Owns shared flows and foundations"
-  }'
-```
-
-Excluir um time:
-
-```bash
-curl -X DELETE "$BASE_URL/teams/TEAM_ID"
-```
-
-### Tarefas
-
-Criar uma tarefa:
-
-```bash
-curl -X POST "$BASE_URL/tasks" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "title": "Prepare sprint board",
-    "description": "Group tasks by delivery team",
-    "status": "Pendente",
-    "dueDate": "2026-05-31T18:00:00.000Z",
-    "teamIds": ["TEAM_ID"]
-  }'
-```
-
-Listar tarefas com filtros:
-
-```bash
-curl "$BASE_URL/tasks?teamId=TEAM_ID&status=Pendente&sort=dueDate&limit=20&offset=0"
-```
-
-Se precisar usar o status `Em Progresso` na query string, encode o espaço: `Em%20Progresso`.
-
-Buscar uma tarefa:
-
-```bash
-curl "$BASE_URL/tasks/TASK_ID"
-```
-
-Atualizar uma tarefa:
-
-```bash
-curl -X PUT "$BASE_URL/tasks/TASK_ID" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "title": "Prepare sprint board",
-    "status": "Em Progresso",
-    "teamIds": ["TEAM_ID"]
-  }'
-```
-
-Excluir uma tarefa:
-
-```bash
-curl -X DELETE "$BASE_URL/tasks/TASK_ID"
-```
-
 ## Onde continuar
 
 - Setup do frontend, comandos do Expo e resolução da URL da API: [`front/README.md`](./front/README.md)
-- Setup do backend, Docker, Prisma e comandos de seed: [`back/README.md`](./back/README.md)
+- Setup do backend, Docker, Prisma, formato da API e exemplos de CRUD: [`back/README.md`](./back/README.md)

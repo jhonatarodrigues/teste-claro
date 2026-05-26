@@ -18,5 +18,10 @@
   "include": [
     "src",
     "prisma"
+  ],
+  "exclude": [
+    "src/tests",
+    "src/**/*.test.ts",
+    "src/**/*.test.tsx"
   ]
 }
