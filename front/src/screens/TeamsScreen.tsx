@@ -18,7 +18,14 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Teams'>;
 export function TeamsScreen({ navigation }: Props) {
   const [search, setSearch] = useState('');
   const { removeTeam } = useTeamMutations();
-  const { data: teamsResponse, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useInfiniteTeams({
+  const {
+    data: teamsResponse,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+    isError,
+  } = useInfiniteTeams({
     search,
     limit: 10,
   });
@@ -102,6 +109,11 @@ export function TeamsScreen({ navigation }: Props) {
               <ActivityIndicator color="#00b37e" />
               <Text className="mt-3 text-sm text-app-muted">Carregando times...</Text>
             </View>
+          ) : isError ? (
+            <EmptyState
+              title="Não foi possível carregar os times"
+              description="Tente novamente em instantes para continuar."
+            />
           ) : (
             <EmptyState title="Nenhum time encontrado" description="Ajuste sua busca ou crie um novo time." />
           )
@@ -125,6 +137,10 @@ export function TeamsScreen({ navigation }: Props) {
             ) : null}
 
             <View className="mt-6">
+              <Button title="Ver todas as tarefas" variant="ghost" onPress={() => navigation.navigate('Tasks')} />
+            </View>
+
+            <View className="mt-3">
               <Button title="Criar time" onPress={() => navigation.navigate('TeamForm')} />
             </View>
           </View>

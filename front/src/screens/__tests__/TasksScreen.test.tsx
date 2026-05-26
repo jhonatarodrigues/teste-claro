@@ -1,4 +1,4 @@
-import { render } from '@testing-library/react-native';
+import { fireEvent, render } from '@testing-library/react-native';
 
 import { TasksScreen } from '../TasksScreen';
 
@@ -86,12 +86,14 @@ describe('TasksScreen', () => {
   });
 
   it('renders mocked tasks on the main screen', () => {
+    const navigation = {
+      goBack: jest.fn(),
+      navigate: jest.fn(),
+    };
+
     const { getByText, getAllByText, getByTestId } = render(
       <TasksScreen
-        navigation={{
-          goBack: jest.fn(),
-          navigate: jest.fn(),
-        } as any}
+        navigation={navigation as any}
         route={{ key: 'Tasks', name: 'Tasks', params: undefined } as any}
       />,
     );
@@ -105,6 +107,10 @@ describe('TasksScreen', () => {
     expect(getByTestId('tasks-team-carousel-container').props.className).toContain('-mx-5');
     expect(getByTestId('tasks-list').props.stickyHeaderIndices).toEqual([]);
     expect(typeof getByTestId('tasks-list').props.onScroll).toBe('function');
+
+    fireEvent.press(getByText('Task title'));
+
+    expect(navigation.navigate).toHaveBeenCalledWith('TaskDetails', { taskId: 'task-1' });
   });
 
   it('requests the next page when the list reaches the end', () => {

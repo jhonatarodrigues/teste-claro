@@ -52,6 +52,7 @@ describe('TeamFormScreen', () => {
           id: 'team-1',
           name: 'Existing Team',
           colorHex: '#00B37E',
+          description: 'Existing description',
         },
       },
       isLoading: false,
@@ -73,6 +74,7 @@ describe('TeamFormScreen', () => {
       expect(getByText('Salvar')).toBeTruthy();
       expect(getByText('Excluir time')).toBeTruthy();
       expect(getByDisplayValue('Existing Team')).toBeTruthy();
+      expect(getByDisplayValue('Existing description')).toBeTruthy();
     });
 
     fireEvent.press(getByText('Salvar'));
@@ -83,6 +85,7 @@ describe('TeamFormScreen', () => {
         input: {
           name: 'Existing Team',
           colorHex: '#00B37E',
+          description: 'Existing description',
         },
       });
       expect(navigation.goBack).toHaveBeenCalled();
@@ -98,6 +101,7 @@ describe('TeamFormScreen', () => {
           id: 'team-1',
           name: 'Existing Team',
           colorHex: '#00B37E',
+          description: 'Existing description',
         },
       },
       isLoading: false,

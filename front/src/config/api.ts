@@ -10,7 +10,14 @@ function normalizeConfiguredUrl(value: string) {
     return '';
   }
 
-  return trimmed.endsWith(API_PATH) ? trimmed : `${trimmed}${API_PATH}`;
+  const url = new URL(trimmed);
+
+  if (url.pathname === API_PATH || url.pathname.startsWith(`${API_PATH}/`)) {
+    return url.toString().replace(/\/+$/, '');
+  }
+
+  url.pathname = `${url.pathname.replace(/\/+$/, '')}${API_PATH}`;
+  return url.toString().replace(/\/+$/, '');
 }
 
 export function resolveApiBaseUrl(configuredUrl = process.env.EXPO_PUBLIC_API_URL, platform = Platform.OS) {

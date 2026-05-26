@@ -2,6 +2,7 @@ import { Pressable, Text, View } from 'react-native';
 
 import { Team } from '../../types/team';
 import { Task } from '../../types/task';
+import { formatDueDateLabel } from '../../utils/due-date';
 import { StatusBadge } from '../ui/StatusBadge';
 import { TeamChip } from '../ui/TeamChip';
 
@@ -13,6 +14,7 @@ type TaskCardProps = {
 
 export function TaskCard({ task, teams, onPress }: TaskCardProps) {
   const relatedTeams = teams.filter((team) => task.teamIds.includes(team.id));
+  const dueDateLabel = formatDueDateLabel(task.dueDate);
 
   return (
     <Pressable onPress={onPress} className="rounded-card bg-app-surface px-4 py-4">
@@ -29,6 +31,8 @@ export function TaskCard({ task, teams, onPress }: TaskCardProps) {
       {task.description ? (
         <Text className="mt-3 text-sm leading-5 text-white/90">{task.description}</Text>
       ) : null}
+
+      {dueDateLabel ? <Text className="mt-3 text-xs text-app-muted">Vencimento: {dueDateLabel}</Text> : null}
 
       <View className="mt-2 flex-row flex-wrap">
         {relatedTeams.map((team) => (

@@ -1,6 +1,6 @@
 import { ChevronDown, Check } from 'lucide-react-native';
 import { useMemo, useState } from 'react';
-import { Modal, Pressable, Text, View } from 'react-native';
+import { Modal, Pressable, ScrollView, Text, View } from 'react-native';
 
 type SelectOption = {
   label: string;
@@ -13,7 +13,7 @@ type SelectProps = {
   options: SelectOption[];
   value?: string;
   values?: string[];
-  onChange: (value: string) => void;
+  onChange?: (value: string) => void;
   onMultiChange?: (values: string[]) => void;
   error?: string;
   multiple?: boolean;
@@ -49,7 +49,7 @@ export function Select({
 
   const toggleValue = (nextValue: string) => {
     if (!multiple) {
-      onChange(nextValue);
+      onChange?.(nextValue);
       setVisible(false);
       return;
     }
@@ -80,7 +80,7 @@ export function Select({
         <Pressable className="flex-1 items-center justify-center bg-black/50 px-6" onPress={() => setVisible(false)}>
           <Pressable className="w-full rounded-2xl bg-app-surface p-4" onPress={() => undefined}>
             <Text className="mb-3 text-lg font-semibold text-white">{placeholder}</Text>
-            <View className="gap-2">
+            <ScrollView className="max-h-80" contentContainerStyle={{ rowGap: 8 }} showsVerticalScrollIndicator={false}>
               {options.map((option) => {
                 const selected = multiple ? values.includes(option.value) : option.value === value;
 
@@ -95,7 +95,7 @@ export function Select({
                   </Pressable>
                 );
               })}
-            </View>
+            </ScrollView>
             {multiple ? (
               <Pressable
                 onPress={() => setVisible(false)}

@@ -1,6 +1,6 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ChevronLeft, Trash2 } from 'lucide-react-native';
-import { Alert, Pressable, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, Pressable, Text, View } from 'react-native';
 
 import { Button } from '../components/ui/Button';
 import { EmptyState } from '../components/ui/EmptyState';
@@ -11,23 +11,48 @@ import { useTask } from '../hooks/useTask';
 import { useTaskMutations } from '../hooks/useTaskMutations';
 import { useTeams } from '../hooks/useTeams';
 import { RootStackParamList } from '../navigation/types';
+import { formatDueDateLabel } from '../utils/due-date';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'TaskDetails'>;
-
-const nextStatusMap = {
-  Pendente: 'Em Progresso',
-  'Em Progresso': 'Concluida',
-  Concluida: 'Pendente',
-} as const;
 
 export function TaskDetailsScreen({ navigation, route }: Props) {
   const taskId = route.params.taskId;
   const { data: taskResponse, isLoading } = useTask(taskId);
-  const { data: teamsResponse } = useTeams();
+  const { data: teamsResponse } = useTeams({ limit: 1000 });
   const { deleteTask, updateStatus } = useTaskMutations();
 
   const teams = teamsResponse?.data ?? [];
   const task = taskResponse?.data;
+  const dueDateLabel = formatDueDateLabel(task?.dueDate);
+
+  const handleDelete = () => {
+    Alert.alert('Excluir tarefa', 'Deseja remover essa tarefa?', [
+      { text: 'Cancelar', style: 'cancel' },
+      {
+        text: 'Excluir',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            await deleteTask.mutateAsync(taskId);
+            navigation.goBack();
+          } catch {
+            Alert.alert('Não foi possível excluir a tarefa', 'Tente novamente em instantes.');
+          }
+        },
+      },
+    ]);
+  };
+
+  const handleCompleteTask = async () => {
+    try {
+      await updateStatus.mutateAsync({
+        id: taskId,
+        status: 'Concluida',
+      });
+    } catch {
+      Alert.alert('Não foi possível atualizar o status', 'Tente novamente em instantes.');
+    }
+  };
 
   return (
     <Screen
@@ -39,33 +64,30 @@ export function TaskDetailsScreen({ navigation, route }: Props) {
               <ChevronLeft color="#ffffff" size={20} />
             </Pressable>
             <Pressable
-              onPress={() =>
-                Alert.alert('Excluir tarefa', 'Deseja remover essa tarefa?', [
-                  { text: 'Cancelar', style: 'cancel' },
-                  {
-                    text: 'Excluir',
-                    style: 'destructive',
-                    onPress: async () => {
-                      await deleteTask.mutateAsync(taskId);
-                      navigation.goBack();
-                    },
-                  },
-                ])
-              }
+              onPress={deleteTask.isPending ? undefined : handleDelete}
+              disabled={deleteTask.isPending}
+              testID="task-details-delete-action"
               className="h-12 w-12 items-end justify-center"
             >
-              <Trash2 color="#ffffff" size={18} />
+              {deleteTask.isPending ? <ActivityIndicator color="#ffffff" size="small" /> : <Trash2 color="#ffffff" size={18} />}
             </Pressable>
           </View>
         </View>
       }
     >
       <View>
+        {isLoading ? (
+          <View className="mt-10 items-center py-8">
+            <ActivityIndicator color="#00b37e" />
+            <Text className="mt-3 text-sm text-app-muted">Carregando detalhes da tarefa...</Text>
+          </View>
+        ) : null}
+
         {!task && !isLoading ? (
           <View className="mt-10">
             <EmptyState
               title="Tarefa não encontrada"
-              description="Essa tarefa não está mais disponível no mock atual."
+              description="Não foi possível carregar os detalhes desta tarefa."
             />
           </View>
         ) : null}
@@ -79,6 +101,7 @@ export function TaskDetailsScreen({ navigation, route }: Props) {
                   <Text className="mt-3 text-sm leading-6 text-white/85">
                     {task.description || 'Sem descrição para esta tarefa.'}
                   </Text>
+                  {dueDateLabel ? <Text className="mt-3 text-sm text-app-muted">Vencimento: {dueDateLabel}</Text> : null}
                 </View>
                 <StatusBadge status={task.status} />
               </View>
@@ -95,15 +118,11 @@ export function TaskDetailsScreen({ navigation, route }: Props) {
             <View className="mt-5 gap-3">
               <Button title="Editar tarefa" onPress={() => navigation.navigate('TaskForm', { taskId })} />
               <Button
-                title={`Mover para ${nextStatusMap[task.status]}`}
+                title={task.status === 'Concluida' ? 'Tarefa concluida' : 'Marcar como concluida'}
                 variant="ghost"
-                onPress={async () => {
-                  await updateStatus.mutateAsync({
-                    id: taskId,
-                    status: nextStatusMap[task.status],
-                  });
-                  navigation.replace('TaskDetails', { taskId });
-                }}
+                onPress={handleCompleteTask}
+                loading={updateStatus.isPending}
+                disabled={task.status === 'Concluida'}
               />
             </View>
           </>

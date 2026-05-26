@@ -21,9 +21,10 @@ const AnimatedFlatList = Animated.createAnimatedComponent(FlatList<Task>);
 
 export function TasksScreen({ navigation, route }: Props) {
   const initialTeamId = route.params?.teamId;
+  const teamName = route.params?.teamName;
   const { filters, search, setSearch, setStatus, status, teamId, setTeamId } = useTaskFilters(initialTeamId);
-  const { data: tasksResponse, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useInfiniteTasks(filters);
-  const { data: teamsResponse } = useTeams();
+  const { data: tasksResponse, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isError } = useInfiniteTasks(filters);
+  const { data: teamsResponse, isError: isTeamsError } = useTeams({ limit: 1000 });
   const scrollY = useRef(new Animated.Value(0)).current;
 
   const teams = teamsResponse?.data ?? [];
@@ -62,7 +63,10 @@ export function TasksScreen({ navigation, route }: Props) {
           </Pressable>
 
           <View className="mt-6">
-            <SectionTitle title="Tarefas" subtitle="adicione a galera e separe os times" />
+            <SectionTitle
+              title="Tarefas"
+              subtitle={teamName ? `Filtradas por ${teamName}` : 'Visualize e organize todas as tarefas'}
+            />
           </View>
         </View>
       </Animated.View>
@@ -79,7 +83,7 @@ export function TasksScreen({ navigation, route }: Props) {
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <View className="mb-3 px-5">
-            <TaskCard task={item} teams={teams} onPress={() => navigation.navigate('TaskForm', { taskId: item.id })} />
+            <TaskCard task={item} teams={teams} onPress={() => navigation.navigate('TaskDetails', { taskId: item.id })} />
           </View>
         )}
         keyboardShouldPersistTaps="handled"
@@ -112,6 +116,13 @@ export function TasksScreen({ navigation, route }: Props) {
             <View className="items-center px-5 py-8">
               <ActivityIndicator testID="tasks-loading-indicator" color="#00b37e" />
               <Text className="mt-3 text-sm text-app-muted">Carregando tarefas...</Text>
+            </View>
+          ) : isError || isTeamsError ? (
+            <View className="px-5">
+              <EmptyState
+                title="Não foi possível carregar as tarefas"
+                description="Tente novamente em instantes para continuar."
+              />
             </View>
           ) : (
             <View className="px-5">

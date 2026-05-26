@@ -1,6 +1,7 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { CheckCheck, ChevronLeft, Trash2 } from 'lucide-react-native';
-import { ActivityIndicator, Pressable, Text, View } from 'react-native';
+import { useMemo } from 'react';
+import { ActivityIndicator, Alert, Pressable, Text, View } from 'react-native';
 
 import { TaskForm, TaskFormData } from '../components/tasks/TaskForm';
 import { EmptyState } from '../components/ui/EmptyState';
@@ -9,6 +10,7 @@ import { useTask } from '../hooks/useTask';
 import { useTaskMutations } from '../hooks/useTaskMutations';
 import { useTeams } from '../hooks/useTeams';
 import { RootStackParamList } from '../navigation/types';
+import { formatDueDateInput, normalizeDueDateInput } from '../utils/due-date';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'TaskForm'>;
 
@@ -16,37 +18,75 @@ export function TaskFormScreen({ navigation, route }: Props) {
   const taskId = route.params?.taskId;
   const presetTeamId = route.params?.teamId;
   const editing = Boolean(taskId);
-  const { data: teamsResponse } = useTeams();
+  const { data: teamsResponse } = useTeams({ limit: 1000 });
   const { data: taskResponse, isLoading } = useTask(taskId);
   const { createTask, updateTask, deleteTask } = useTaskMutations();
 
   const teams = teamsResponse?.data ?? [];
   const currentTask = taskResponse?.data;
 
-  const defaultValues = currentTask
-    ? {
-        title: currentTask.title,
-        description: currentTask.description ?? '',
-        status: currentTask.status,
-        dueDate: currentTask.dueDate ?? '',
-        teamIds: currentTask.teamIds,
-      }
-    : {
-        title: '',
-        description: '',
-        status: 'Pendente' as const,
-        dueDate: '',
-        teamIds: presetTeamId ? [presetTeamId] : [],
-      };
+  const defaultValues = useMemo(
+    () =>
+      currentTask
+        ? {
+            title: currentTask.title,
+            description: currentTask.description ?? '',
+            status: currentTask.status,
+            dueDate: formatDueDateInput(currentTask.dueDate),
+            teamIds: currentTask.teamIds,
+          }
+        : {
+            title: '',
+            description: '',
+            status: 'Pendente' as const,
+            dueDate: '',
+            teamIds: presetTeamId ? [presetTeamId] : [],
+          },
+    [currentTask, presetTeamId],
+  );
 
   const handleSubmit = async (values: TaskFormData) => {
-    if (editing && taskId) {
-      await updateTask.mutateAsync({ id: taskId, input: { status: values.status } });
-    } else {
-      await createTask.mutateAsync(values);
+    const input = {
+      ...values,
+      dueDate: normalizeDueDateInput(values.dueDate),
+    };
+
+    try {
+      if (editing && taskId) {
+        await updateTask.mutateAsync({ id: taskId, input });
+      } else {
+        await createTask.mutateAsync(input);
+      }
+
+      navigation.goBack();
+    } catch {
+      Alert.alert(
+        'Não foi possível salvar a tarefa',
+        'Revise os dados informados e tente novamente em instantes.',
+      );
+    }
+  };
+
+  const handleDelete = () => {
+    if (!taskId || deleteTask.isPending) {
+      return;
     }
 
-    navigation.goBack();
+    Alert.alert('Excluir tarefa', 'Deseja remover essa tarefa?', [
+      { text: 'Cancelar', style: 'cancel' },
+      {
+        text: 'Excluir',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            await deleteTask.mutateAsync(taskId);
+            navigation.goBack();
+          } catch {
+            Alert.alert('Não foi possível excluir a tarefa', 'Tente novamente em instantes.');
+          }
+        },
+      },
+    ]);
   };
 
   return (
@@ -60,14 +100,7 @@ export function TaskFormScreen({ navigation, route }: Props) {
             </Pressable>
             {editing && taskId ? (
               <Pressable
-                onPress={
-                  deleteTask.isPending
-                    ? undefined
-                    : async () => {
-                        await deleteTask.mutateAsync(taskId);
-                        navigation.goBack();
-                      }
-                }
+                onPress={deleteTask.isPending ? undefined : handleDelete}
                 disabled={deleteTask.isPending}
                 testID="task-delete-action"
                 className="h-12 w-12 items-end justify-center"
@@ -96,7 +129,12 @@ export function TaskFormScreen({ navigation, route }: Props) {
       }
     >
       <View className="mt-10">
-        {editing && !currentTask && !isLoading ? (
+        {editing && isLoading ? (
+          <View className="items-center py-8">
+            <ActivityIndicator color="#00b37e" />
+            <Text className="mt-3 text-sm text-app-muted">Carregando tarefa...</Text>
+          </View>
+        ) : editing && !currentTask ? (
           <EmptyState
             title="Tarefa não encontrada"
             description="Não foi possível carregar essa tarefa para edição."
@@ -108,7 +146,6 @@ export function TaskFormScreen({ navigation, route }: Props) {
             submitLabel={editing ? 'Salvar' : 'Criar'}
             onSubmit={handleSubmit}
             loading={createTask.isPending || updateTask.isPending}
-            statusOnlyEdit={editing}
           />
         )}
       </View>

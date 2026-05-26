@@ -93,6 +93,20 @@ describe('TeamsScreen', () => {
     });
   });
 
+  it('allows opening the global task list directly from the teams screen', () => {
+    const navigation = {
+      navigate: jest.fn(),
+    };
+
+    const { getByText } = render(
+      <TeamsScreen navigation={navigation as any} route={{ key: 'Teams', name: 'Teams' } as any} />,
+    );
+
+    fireEvent.press(getByText('Ver todas as tarefas'));
+
+    expect(navigation.navigate).toHaveBeenCalledWith('Tasks');
+  });
+
   it('navigates to team form in edit mode from the secondary action', () => {
     const navigation = {
       navigate: jest.fn(),

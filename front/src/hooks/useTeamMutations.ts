@@ -5,17 +5,11 @@ import { CreateTeamInput } from '../repositories/contracts/team-repository';
 
 export function useTeamMutations() {
   const queryClient = useQueryClient();
-  const invalidateRelatedQueries = async () => {
-    await Promise.all([
-      queryClient.invalidateQueries({ queryKey: ['teams'] }),
-      queryClient.invalidateQueries({ queryKey: ['tasks'] }),
-    ]);
-  };
 
   const createTeam = useMutation({
     mutationFn: (input: CreateTeamInput) => repositories.teams.create(input),
     onSuccess: async () => {
-      await invalidateRelatedQueries();
+      await queryClient.invalidateQueries({ queryKey: ['teams'] });
     },
   });
 
@@ -23,14 +17,18 @@ export function useTeamMutations() {
     mutationFn: ({ id, input }: { id: string; input: CreateTeamInput }) =>
       repositories.teams.update(id, input),
     onSuccess: async () => {
-      await invalidateRelatedQueries();
+      await queryClient.invalidateQueries({ queryKey: ['teams'] });
     },
   });
 
   const removeTeam = useMutation({
     mutationFn: (id: string) => repositories.teams.remove(id),
     onSuccess: async () => {
-      await invalidateRelatedQueries();
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['teams'] }),
+        queryClient.invalidateQueries({ queryKey: ['tasks'] }),
+        queryClient.invalidateQueries({ queryKey: ['task'] }),
+      ]);
     },
   });
 

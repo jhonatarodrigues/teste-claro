@@ -6,15 +6,19 @@ import { z } from 'zod';
 
 import { Team } from '../../types/team';
 import { TaskStatus } from '../../types/task';
+import { isAcceptedDueDateInput } from '../../utils/due-date';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import { Select } from '../ui/Select';
 
 export const taskFormSchema = z.object({
-  title: z.string().min(3, 'Informe pelo menos 3 caracteres'),
-  description: z.string().optional(),
+  title: z.string().trim().min(3, 'Informe pelo menos 3 caracteres'),
+  description: z.string().trim().optional(),
   status: z.enum(['Pendente', 'Em Progresso', 'Concluida']),
-  dueDate: z.string().optional(),
+  dueDate: z
+    .string()
+    .optional()
+    .refine((value) => isAcceptedDueDateInput(value), 'Informe uma data valida no formato AAAA-MM-DD'),
   teamIds: z.array(z.string()),
 });
 
@@ -26,7 +30,6 @@ type TaskFormProps = {
   submitLabel: string;
   onSubmit: (values: TaskFormData) => void;
   loading?: boolean;
-  statusOnlyEdit?: boolean;
 };
 
 export function TaskForm({
@@ -35,7 +38,6 @@ export function TaskForm({
   submitLabel,
   onSubmit,
   loading = false,
-  statusOnlyEdit = false,
 }: TaskFormProps) {
   const fallbackValues = useMemo<TaskFormData>(
     () => ({
@@ -73,7 +75,6 @@ export function TaskForm({
             placeholder="Título"
             value={value}
             onChangeText={onChange}
-            editable={!statusOnlyEdit}
             error={errors.title?.message}
           />
         )}
@@ -88,8 +89,20 @@ export function TaskForm({
             placeholder="Descrição"
             value={value}
             onChangeText={onChange}
-            editable={!statusOnlyEdit}
             error={errors.description?.message}
+          />
+        )}
+      />
+
+      <Controller
+        control={control}
+        name="dueDate"
+        render={({ field: { onChange, value } }) => (
+          <Input
+            placeholder="Data de vencimento (AAAA-MM-DD)"
+            value={value}
+            onChangeText={onChange}
+            error={errors.dueDate?.message}
           />
         )}
       />
@@ -99,13 +112,11 @@ export function TaskForm({
         name="teamIds"
         render={({ field: { value, onChange } }) => (
           <Select
-            placeholder="Selecione um time"
+            placeholder="Selecione um ou mais times"
             multiple
             values={value}
-            onChange={() => undefined}
             onMultiChange={onChange}
             options={teams.map((team) => ({ label: team.name, value: team.id }))}
-            disabled={statusOnlyEdit}
             error={errors.teamIds?.message}
           />
         )}

@@ -1,4 +1,5 @@
 import { fireEvent, render, waitFor } from '@testing-library/react-native';
+import { Alert } from 'react-native';
 
 import { TaskFormScreen } from '../TaskFormScreen';
 
@@ -15,7 +16,6 @@ let mockTaskFormProps:
         dueDate: string;
         teamIds: string[];
       }) => void;
-      statusOnlyEdit?: boolean;
     }
   | undefined;
 
@@ -86,7 +86,7 @@ describe('TaskFormScreen', () => {
     });
   });
 
-  it('allows only status updates in edit mode', async () => {
+  it('submits full task updates in edit mode', async () => {
     const navigation = {
       goBack: jest.fn(),
     };
@@ -98,14 +98,13 @@ describe('TaskFormScreen', () => {
       />,
     );
 
-    expect(mockTaskFormProps?.statusOnlyEdit).toBe(true);
     expect(mockTaskFormProps?.submitLabel).toBe('Salvar');
 
     await mockTaskFormProps?.onSubmit({
       title: 'Updated title',
       description: 'Updated description',
       status: 'Concluida',
-      dueDate: '',
+      dueDate: '2026-05-26',
       teamIds: ['team-2'],
     });
 
@@ -113,7 +112,11 @@ describe('TaskFormScreen', () => {
       expect(mockUpdateTaskMutateAsync).toHaveBeenCalledWith({
         id: 'task-1',
         input: {
+          title: 'Updated title',
+          description: 'Updated description',
           status: 'Concluida',
+          dueDate: '2026-05-26T00:00:00.000Z',
+          teamIds: ['team-2'],
         },
       });
       expect(navigation.goBack).toHaveBeenCalled();
@@ -138,8 +141,9 @@ describe('TaskFormScreen', () => {
     expect(getByTestId('task-delete-loading')).toBeTruthy();
   });
 
-  it('returns to the task list instead of popping to the teams screen after delete', async () => {
+  it('confirms before deleting and returns to the task list afterwards', async () => {
     mockDeleteTaskMutateAsync.mockResolvedValueOnce(undefined);
+    const alertSpy = jest.spyOn(Alert, 'alert').mockImplementation(() => undefined);
 
     const navigation = {
       goBack: jest.fn(),
@@ -155,10 +159,19 @@ describe('TaskFormScreen', () => {
 
     fireEvent.press(getByTestId('task-delete-action'));
 
+    expect(alertSpy).toHaveBeenCalled();
+
+    const [, , actions] = alertSpy.mock.calls[0] ?? [];
+    const confirmAction = actions?.find((action: { style?: string }) => action.style === 'destructive');
+
+    await confirmAction?.onPress?.();
+
     await waitFor(() => {
       expect(mockDeleteTaskMutateAsync).toHaveBeenCalledWith('task-1');
       expect(navigation.goBack).toHaveBeenCalled();
       expect(navigation.popToTop).not.toHaveBeenCalled();
     });
+
+    alertSpy.mockRestore();
   });
 });

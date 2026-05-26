@@ -3,7 +3,7 @@ import { ChevronLeft, UsersRound } from 'lucide-react-native';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { Alert, Pressable, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, Pressable, Text, View } from 'react-native';
 
 import { Button } from '../components/ui/Button';
 import { ColorPickerField } from '../components/ui/ColorPickerField';
@@ -19,7 +19,7 @@ type Props = NativeStackScreenProps<RootStackParamList, 'TeamForm'>;
 export function TeamFormScreen({ navigation, route }: Props) {
   const teamId = route.params?.teamId;
   const isEditMode = Boolean(teamId);
-  const { data: teamResponse } = useTeam(teamId);
+  const { data: teamResponse, isLoading } = useTeam(teamId);
   const { createTeam, updateTeam, removeTeam } = useTeamMutations();
   const {
     control,
@@ -31,6 +31,7 @@ export function TeamFormScreen({ navigation, route }: Props) {
     defaultValues: {
       name: '',
       colorHex: '#E7FF2F',
+      description: '',
     },
   });
 
@@ -42,20 +43,25 @@ export function TeamFormScreen({ navigation, route }: Props) {
     reset({
       name: teamResponse.data.name,
       colorHex: teamResponse.data.colorHex,
+      description: teamResponse.data.description ?? '',
     });
   }, [reset, teamResponse]);
 
   const onSubmit = async (values: TeamFormValues) => {
-    if (teamId) {
-      await updateTeam.mutateAsync({
-        id: teamId,
-        input: values,
-      });
-    } else {
-      await createTeam.mutateAsync(values);
-    }
+    try {
+      if (teamId) {
+        await updateTeam.mutateAsync({
+          id: teamId,
+          input: values,
+        });
+      } else {
+        await createTeam.mutateAsync(values);
+      }
 
-    navigation.goBack();
+      navigation.goBack();
+    } catch {
+      Alert.alert('Não foi possível salvar o time', 'Revise os dados informados e tente novamente.');
+    }
   };
 
   const handleDelete = () => {
@@ -72,8 +78,12 @@ export function TeamFormScreen({ navigation, route }: Props) {
         text: 'Excluir',
         style: 'destructive',
         onPress: async () => {
-          await removeTeam.mutateAsync(teamId);
-          navigation.goBack();
+          try {
+            await removeTeam.mutateAsync(teamId);
+            navigation.goBack();
+          } catch {
+            Alert.alert('Não foi possível excluir o time', 'Tente novamente em instantes.');
+          }
         },
       },
     ]);
@@ -99,29 +109,54 @@ export function TeamFormScreen({ navigation, route }: Props) {
       }
     >
       <View className="mt-10 gap-4">
-        <Controller
-          control={control}
-          name="name"
-          render={({ field: { onChange, value } }) => (
-            <Input placeholder="Nome do time" value={value} onChangeText={onChange} error={errors.name?.message} />
-          )}
-        />
+        {isEditMode && isLoading ? (
+          <View className="items-center py-8">
+            <ActivityIndicator color="#00b37e" />
+            <Text className="mt-3 text-sm text-app-muted">Carregando time...</Text>
+          </View>
+        ) : null}
 
-        <Controller
-          control={control}
-          name="colorHex"
-          render={({ field: { onChange, value } }) => (
-            <ColorPickerField value={value} onChange={onChange} error={errors.colorHex?.message} />
-          )}
-        />
+        {!isEditMode || !isLoading ? (
+          <>
+            <Controller
+              control={control}
+              name="name"
+              render={({ field: { onChange, value } }) => (
+                <Input placeholder="Nome do time" value={value} onChangeText={onChange} error={errors.name?.message} />
+              )}
+            />
 
-        <Button
-          title={isEditMode ? 'Salvar' : 'Criar'}
-          onPress={handleSubmit(onSubmit)}
-          loading={isSubmitting}
-        />
-        {isEditMode ? (
-          <Button title="Excluir time" variant="danger" onPress={handleDelete} disabled={isSubmitting} />
+            <Controller
+              control={control}
+              name="colorHex"
+              render={({ field: { onChange, value } }) => (
+                <ColorPickerField value={value} onChange={onChange} error={errors.colorHex?.message} />
+              )}
+            />
+
+            <Controller
+              control={control}
+              name="description"
+              render={({ field: { onChange, value } }) => (
+                <Input
+                  multiline
+                  placeholder="Descrição do time"
+                  value={value}
+                  onChangeText={onChange}
+                  error={errors.description?.message}
+                />
+              )}
+            />
+
+            <Button
+              title={isEditMode ? 'Salvar' : 'Criar'}
+              onPress={handleSubmit(onSubmit)}
+              loading={isSubmitting}
+            />
+            {isEditMode ? (
+              <Button title="Excluir time" variant="danger" onPress={handleDelete} disabled={isSubmitting} />
+            ) : null}
+          </>
         ) : null}
       </View>
     </Screen>

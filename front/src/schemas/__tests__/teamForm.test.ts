@@ -18,4 +18,13 @@ describe('teamFormSchema', () => {
 
     expect(result.success).toBe(false);
   });
+
+  it('fails when the name contains only spaces', () => {
+    const result = teamFormSchema.safeParse({
+      name: '   ',
+      colorHex: '#22D3EE',
+    });
+
+    expect(result.success).toBe(false);
+  });
 });
